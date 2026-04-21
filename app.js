@@ -784,7 +784,8 @@ App.Invoices = {
     if (!invId) { toast('احفظ الفاتورة أولاً', 'error'); return; }
 
     try {
-      const result = await callEdge('confirm_invoice', { invoice_id: invId, shop_id: State.shop.id });
+      const { data, error } = await _sb.rpc('confirm_invoice_function', { p_invoice_id: invId, p_shop_id: State.shop.id });
+if (error) throw error;
       if (result.queued) return;
 
       toast('تم ترحيل الفاتورة محاسبياً ✓', 'success');
@@ -897,15 +898,16 @@ App.Payments = {
     }
 
     try {
-      const result = await callEdge('create_payment', {
-        shop_id: State.shop.id,
-        payment_type: type,
-        party_id: partyId,
-        amount,
-        payment_method: method,
-        payment_date: date,
-        notes: notes || null,
-      }, true);
+      const { data, error } = await _sb.rpc('create_payment_function', {
+  p_shop_id: State.shop.id,
+  p_payment_type: type,
+  p_amount: amount,
+  p_party_id: partyId,
+  p_payment_method: method,
+  p_payment_date: date,
+  p_notes: notes || null
+});
+if (error) throw error;
 
       if (result.queued) {
         App.closeOverlay('payment');
@@ -1095,4 +1097,4 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
-}
+      }
