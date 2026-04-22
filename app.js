@@ -75,30 +75,62 @@ App.Auth = {
   },
 
   async register() {
-    const name     = $('reg-name')?.value.trim();
-    const email    = $('reg-email')?.value.trim();
-    const password = $('reg-password')?.value;
-    const shopName = $('reg-shop')?.value.trim();
+  const name     = $('reg-name')?.value.trim();
+  const email    = $('reg-email')?.value.trim();
+  const password = $('reg-password')?.value;
+  const shopName = $('reg-shop')?.value.trim();
 
-    if (!name || !email || !password || !shopName) { toast('يرجى ملء جميع الحقول', 'error'); return; }
-    if (password.length < 8) { toast('كلمة المرور 8 أحرف على الأقل', 'error'); return; }
+  if (!name || !email || !password || !shopName) { 
+    toast('يرجى ملء جميع الحقول', 'error'); 
+    return; 
+  }
+  if (password.length < 8) { 
+    toast('كلمة المرور 8 أحرف على الأقل', 'error'); 
+    return; 
+  }
 
-    const { data, error } = await _sb.auth.signUp({
-      email, password,
-      options: { data: { full_name: name } }
+  // 1. تسجيل المستخدم
+  const { data, error } = await _sb.auth.signUp({
+    email, 
+    password,
+    options: { data: { full_name: name } }
+  });
+  
+  if (error) { 
+    toast(error.message, 'error'); 
+    return; 
+  }
+
+  if (data.user) {
+    // 2. إنشاء المتجر والعضوية باستخدام دالة RPC الآمنة
+    const { data: shopData, error: shopError } = await _sb.rpc('create_shop_for_user', {
+      p_shop_name: shopName,
+      p_user_id: data.user.id
     });
-    if (error) { toast(error.message, 'error'); return; }
-
-    if (data.session) {
-      State.user    = data.user;
-      State.session = data.session;
-      await App.Shops.create(shopName);
-      await App.bootstrap();
-    } else {
-      toast('تم الإرسال — تحقق من بريدك الإلكتروني', 'success');
+    
+    if (shopError || !shopData?.success) {
+      toast('فشل إنشاء المتجر: ' + (shopError?.message || shopData?.error), 'error');
+      return;
     }
-  },
 
+    // 3. تسجيل الدخول تلقائياً (إذا كان البريد مؤكداً تلقائياً)
+    const { error: signInError } = await _sb.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      toast('تم إنشاء الحساب. يرجى تسجيل الدخول.', 'success');
+      App.Auth.showTab('login');
+      return;
+    }
+
+    // 4. إعادة تحميل الجلسة
+    const { data: sessionData } = await _sb.auth.getSession();
+    State.user = sessionData.session.user;
+    State.session = sessionData.session;
+    
+    await App.bootstrap();
+  } else {
+    toast('تم الإرسال — تحقق من بريدك الإلكتروني', 'success');
+  }
+}
   async logout() {
     await _sb.auth.signOut();
     State.user = null; State.session = null; State.shop = null;
