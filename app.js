@@ -1,20 +1,20 @@
 // ============================================================
-// app.js — SouqSaaS Production Application
-// Vanilla JS | Multi-tenant | Supabase RPC (Final)
+// app.js — SouqSaaS Production Application (FIXED SYNTAX)
+// Vanilla JS | Multi-tenant | Supabase RPC
 // ============================================================
 
 'use strict';
 
-// ── CONFIG — استبدل بقيم مشروعك ──────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────
 const SUPABASE_URL = 'https://oawtdxkylwujcvdzfasn.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3RkeGt5bHd1amN2ZHpmYXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MjMxMjcsImV4cCI6MjA5MjA5OTEyN30.1BvWh200IjumJ5v2JLh0bSZNhIgzQLrTrDSr_EJfFAQ';
 
-// ── Supabase Client ──────────────────────────────────────────
+// ── Supabase Client ────────────────────────────────────────
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: { persistSession: true, autoRefreshToken: true },
 });
 
-// ── State ────────────────────────────────────────────────────
+// ── State ──────────────────────────────────────────────────
 const State = {
   user:       null,
   session:    null,
@@ -28,16 +28,14 @@ const State = {
   currentInvoiceFilter: 'all',
 };
 
-// ── Utility ──────────────────────────────────────────────────
+// ── Utility ────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const fmt = n => Number(n || 0).toLocaleString('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const today = () => new Date().toISOString().split('T')[0];
-const uuid  = () => crypto.randomUUID();
 
 function showEl(id) { $(id)?.classList.remove('hidden'); }
 function hideEl(id) { $(id)?.classList.add('hidden'); }
 
-// Toast notifications
 function toast(msg, type = 'info', duration = 3500) {
   const icons = { success: '✅', error: '❌', info: 'ℹ️' };
   const el = document.createElement('div');
@@ -47,10 +45,10 @@ function toast(msg, type = 'info', duration = 3500) {
   setTimeout(() => el.remove(), duration);
 }
 
-// ── App namespace ─────────────────────────────────────────────
+// ── App Namespace ──────────────────────────────────────────
 const App = {};
 
-// ── AUTH ──────────────────────────────────────────────────────
+// ── AUTH ───────────────────────────────────────────────────
 App.Auth = {
   showTab(tab) {
     ['login','register'].forEach(t => {
@@ -75,62 +73,59 @@ App.Auth = {
   },
 
   async register() {
-  const name     = $('reg-name')?.value.trim();
-  const email    = $('reg-email')?.value.trim();
-  const password = $('reg-password')?.value;
-  const shopName = $('reg-shop')?.value.trim();
+    const name     = $('reg-name')?.value.trim();
+    const email    = $('reg-email')?.value.trim();
+    const password = $('reg-password')?.value;
+    const shopName = $('reg-shop')?.value.trim();
 
-  if (!name || !email || !password || !shopName) { 
-    toast('يرجى ملء جميع الحقول', 'error'); 
-    return; 
-  }
-  if (password.length < 8) { 
-    toast('كلمة المرور 8 أحرف على الأقل', 'error'); 
-    return; 
-  }
+    if (!name || !email || !password || !shopName) { 
+      toast('يرجى ملء جميع الحقول', 'error'); 
+      return; 
+    }
+    if (password.length < 8) { 
+      toast('كلمة المرور 8 أحرف على الأقل', 'error'); 
+      return; 
+    }
 
-  // 1. تسجيل المستخدم
-  const { data, error } = await _sb.auth.signUp({
-    email, 
-    password,
-    options: { data: { full_name: name } }
-  });
-  
-  if (error) { 
-    toast(error.message, 'error'); 
-    return; 
-  }
-
-  if (data.user) {
-    // 2. إنشاء المتجر والعضوية باستخدام دالة RPC الآمنة
-    const { data: shopData, error: shopError } = await _sb.rpc('create_shop_for_user', {
-      p_shop_name: shopName,
-      p_user_id: data.user.id
+    const { data, error } = await _sb.auth.signUp({
+      email, 
+      password,
+      options: { data: { full_name: name } }
     });
     
-    if (shopError || !shopData?.success) {
-      toast('فشل إنشاء المتجر: ' + (shopError?.message || shopData?.error), 'error');
-      return;
+    if (error) { 
+      toast(error.message, 'error'); 
+      return; 
     }
 
-    // 3. تسجيل الدخول تلقائياً (إذا كان البريد مؤكداً تلقائياً)
-    const { error: signInError } = await _sb.auth.signInWithPassword({ email, password });
-    if (signInError) {
-      toast('تم إنشاء الحساب. يرجى تسجيل الدخول.', 'success');
-      App.Auth.showTab('login');
-      return;
-    }
+    if (data.user) {
+      const { data: shopData, error: shopError } = await _sb.rpc('create_shop_for_user', {
+        p_shop_name: shopName,
+        p_user_id: data.user.id
+      });
+      
+      if (shopError || !shopData?.success) {
+        toast('فشل إنشاء المتجر: ' + (shopError?.message || shopData?.error), 'error');
+        return;
+      }
 
-    // 4. إعادة تحميل الجلسة
-    const { data: sessionData } = await _sb.auth.getSession();
-    State.user = sessionData.session.user;
-    State.session = sessionData.session;
-    
-    await App.bootstrap();
-  } else {
-    toast('تم الإرسال — تحقق من بريدك الإلكتروني', 'success');
-  }
-}
+      const { error: signInError } = await _sb.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        toast('تم إنشاء الحساب. يرجى تسجيل الدخول.', 'success');
+        App.Auth.showTab('login');
+        return;
+      }
+
+      const { data: sessionData } = await _sb.auth.getSession();
+      State.user = sessionData.session.user;
+      State.session = sessionData.session;
+      
+      await App.bootstrap();
+    } else {
+      toast('تم الإرسال — تحقق من بريدك الإلكتروني', 'success');
+    }
+  }, // <-- الفاصلة هنا ضرورية
+
   async logout() {
     await _sb.auth.signOut();
     State.user = null; State.session = null; State.shop = null;
@@ -139,7 +134,7 @@ App.Auth = {
   }
 };
 
-// ── SHOPS ─────────────────────────────────────────────────────
+// ── SHOPS ───────────────────────────────────────────────────
 App.Shops = {
   async loadMyShops() {
     const { data, error } = await _sb
@@ -169,7 +164,7 @@ App.Shops = {
   }
 };
 
-// ── BOOTSTRAP ─────────────────────────────────────────────────
+// ── BOOTSTRAP ───────────────────────────────────────────────
 App.bootstrap = async function () {
   try {
     const shops = await App.Shops.loadMyShops();
@@ -197,7 +192,7 @@ App.bootstrap = async function () {
   }
 };
 
-// ── NAVIGATION ────────────────────────────────────────────────
+// ── NAVIGATION ──────────────────────────────────────────────
 App.Nav = {
   go(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -216,7 +211,7 @@ App.Nav = {
   }
 };
 
-// ── DASHBOARD ─────────────────────────────────────────────────
+// ── DASHBOARD ───────────────────────────────────────────────
 App.Dashboard = {
   async load() {
     if (!State.shop) return;
@@ -259,7 +254,7 @@ App.Dashboard = {
   }
 };
 
-// ── PARTIES ───────────────────────────────────────────────────
+// ── PARTIES ─────────────────────────────────────────────────
 App.Parties = {
   async loadAll() {
     if (!State.shop) return;
@@ -314,7 +309,7 @@ App.Parties = {
   getByType(type) { return State.parties.filter(p=>p.party_type===type && p.is_active); }
 };
 
-// ── INVOICES ──────────────────────────────────────────────────
+// ── INVOICES ────────────────────────────────────────────────
 App.Invoices = {
   currentItems: [],
   statusBadge(s) { const map={draft:'<span class="badge badge-yellow">مسودة</span>',confirmed:'<span class="badge badge-green">مؤكدة</span>',settled:'<span class="badge badge-blue">مسواة</span>',cancelled:'<span class="badge badge-red">ملغاة</span>',void:'<span class="badge badge-gray">باطلة</span>'}; return map[s]||s; },
@@ -399,7 +394,6 @@ App.Invoices = {
     }
     toast('تم الحفظ ✓','success'); $('inv-id').value=invId; $('inv-confirm-btn').style.display='block'; await this.loadAll();
   },
-  // ── الإصلاح الأساسي: استخدام RPC بدلاً من callEdge ──
   async confirm(){
     const invId=$('inv-id')?.value; if(!invId){ toast('احفظ الفاتورة أولاً','error'); return; }
     try {
@@ -413,7 +407,7 @@ App.Invoices = {
   viewDetail(id){ const inv=State.invoices.find(i=>i.id===id); if(inv) toast(`فاتورة: ${inv.invoice_number} — ${inv.status}`,'info'); }
 };
 
-// ── PAYMENTS ──────────────────────────────────────────────────
+// ── PAYMENTS ────────────────────────────────────────────────
 App.Payments = {
   async loadAll(){
     if(!State.shop) return;
@@ -446,7 +440,6 @@ App.Payments = {
       partySel.innerHTML='<option value="">— اختر —</option>'+parties.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
     }
   },
-  // ── الإصلاح الأساسي: استخدام RPC بدلاً من callEdge ──
   async save(){
     const type=$('pay-type')?.value; const partyId=$('pay-party')?.value||null; const amount=parseFloat($('pay-amount')?.value);
     const date=$('pay-date')?.value||today(); const method=$('pay-method')?.value||'cash'; const notes=$('pay-notes')?.value.trim();
@@ -470,7 +463,7 @@ App.Payments = {
   }
 };
 
-// ── REPORTS ───────────────────────────────────────────────────
+// ── REPORTS ─────────────────────────────────────────────────
 App.Reports = {
   show(){ App.Nav.go('reports'); const now=new Date(); $('rep-from').value=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0]; $('rep-to').value=today(); },
   async load(){
@@ -502,7 +495,7 @@ App.Reports = {
   }
 };
 
-// ── REALTIME ──────────────────────────────────────────────────
+// ── REALTIME ────────────────────────────────────────────────
 App.Realtime = {
   channel: null,
   init() {
@@ -516,11 +509,11 @@ App.Realtime = {
   destroy(){ if(this.channel) _sb.removeChannel(this.channel); }
 };
 
-// ── OVERLAY HELPERS ───────────────────────────────────────────
+// ── OVERLAY HELPERS ─────────────────────────────────────────
 App.openOverlay=id=>{ $(`overlay-${id}`)?.classList.add('open'); document.body.style.overflow='hidden'; };
 App.closeOverlay=id=>{ $(`overlay-${id}`)?.classList.remove('open'); document.body.style.overflow=''; };
 
-// ── INIT ──────────────────────────────────────────────────────
+// ── INIT ────────────────────────────────────────────────────
 async function init(){
   const { data: { session } } = await _sb.auth.getSession();
   if(session){ State.user=session.user; State.session=session; await App.bootstrap(); }
