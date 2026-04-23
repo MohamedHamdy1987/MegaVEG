@@ -1,0 +1,225 @@
+import { supabase } from "../core/data.js";
+
+// ===============================
+// 🎯 RENDER PAGE
+// ===============================
+
+export async function renderTarhilPage(app){
+
+  const {
+    data,
+    error
+  } =
+  await supabase
+   .from("customer_ledger")
+   .select("*")
+   .order(
+     "trx_date",
+     { ascending:false }
+   );
+
+  if(error){
+
+    console.error(
+      "LEDGER ERROR:",
+      error.message
+    );
+
+    app.innerHTML =
+      `<p>حدث خطأ</p>`;
+
+    return;
+  }
+
+  const grouped =
+    groupByCustomer(data);
+
+  app.innerHTML = `
+
+    <div class="header">
+      <h2>
+      📋 دفتر ترحيلات العملاء
+      </h2>
+    </div>
+
+    ${
+      renderCustomers(
+       grouped
+      )
+    }
+
+  `;
+
+}
+
+
+
+// ===============================
+// 📊 GROUP BY CUSTOMER
+// ===============================
+
+function groupByCustomer(
+rows=[]
+){
+
+ const map={};
+
+ rows.forEach(r=>{
+
+   if(
+    !map[
+      r.customer_id
+    ]
+   ){
+
+    map[
+      r.customer_id
+    ] = {
+
+      name:
+      r.customer_name
+      || "عميل",
+
+      debit:0,
+
+      credit:0,
+
+      balance:0,
+
+      items:[]
+
+    };
+
+   }
+
+   map[
+     r.customer_id
+   ].debit +=
+   Number(
+    r.debit || 0
+   );
+
+   map[
+     r.customer_id
+   ].credit +=
+   Number(
+    r.credit || 0
+   );
+
+   map[
+     r.customer_id
+   ].balance =
+   Number(
+    r.running_balance ||0
+   );
+
+   map[
+     r.customer_id
+   ].items.push(r);
+
+ });
+
+ return map;
+
+}
+
+
+
+// ===============================
+// 👥 RENDER CUSTOMERS
+// ===============================
+
+function renderCustomers(
+grouped
+){
+
+ const ids =
+ Object.keys(
+  grouped
+ );
+
+ if(
+  !ids.length
+ ){
+   return empty();
+ }
+
+ return ids.map(id=>{
+
+   const g=
+   grouped[id];
+
+   return `
+
+    <div class="card">
+
+      <h3>
+      ${g.name}
+      </h3>
+
+      ${
+
+       g.items.map(i=>`
+
+        <div class="row">
+
+        📅 ${i.trx_date}
+        |
+        ${i.description}
+
+        <br>
+
+        مدين:
+        ${i.debit}
+
+        -
+
+        دائن:
+        ${i.credit}
+
+        </div>
+
+       `).join("")
+
+      }
+
+      <hr>
+
+      <p>
+      إجمالي مدين:
+      ${g.debit}
+      </p>
+
+      <p>
+      إجمالي دائن:
+      ${g.credit}
+      </p>
+
+      <h4>
+      الرصيد:
+      ${g.balance}
+      </h4>
+
+    </div>
+
+   `;
+
+ }).join("");
+
+}
+
+
+
+// ===============================
+// 🧩 EMPTY
+// ===============================
+
+function empty(){
+
+ return `
+ <p>
+ لا توجد ترحيلات
+ </p>
+ `;
+
+}
