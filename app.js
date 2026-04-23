@@ -1,79 +1,37 @@
-import { renderDashboard } from "./pages/dashboard.js";
-import { renderInvoicesPage } from "./pages/invoices.js";
-import { renderSalesPage } from "./pages/sales.js";
-import { renderSuppliersPage } from "./pages/suppliers.js";
-import { renderCustomersPage } from "./pages/customers.js";
-import { renderTarhilPage } from "./pages/tarhil.js";
-import { renderKhaznaPage } from "./pages/khazna.js";
-import { renderEmployeesPage } from "./pages/employees.js";
-import { renderMarketShopsPage } from "./pages/market_shops.js";
+window.navigate = function(page){
 
-
-const routes={
-
-dashboard:renderDashboard,
-
-invoices:renderInvoicesPage,
-
-sales:renderSalesPage,
-
-suppliers:renderSuppliersPage,
-
-customers:renderCustomersPage,
-
-tarhil:renderTarhilPage,
-
-khazna:renderKhaznaPage,
-
-employees:renderEmployeesPage,
-
-market_shops:renderMarketShopsPage
-
-};
-
-
-window.navigate=
-async function(page){
-
-const app=
+const app =
 document.getElementById("app");
 
-try{
+const pages = {
 
-if(!routes[page]){
+dashboard:"<h2>الرئيسية تعمل</h2>",
 
-app.innerHTML=
-"صفحة غير موجودة";
+customers:"<h2>صفحة العملاء تعمل</h2>",
 
-return;
+suppliers:"<h2>صفحة الموردين تعمل</h2>",
 
-}
+sales:"<h2>صفحة المبيعات تعمل</h2>",
 
-app.innerHTML=
-"جار التحميل...";
+invoices:"<h2>صفحة الفواتير تعمل</h2>",
 
-await routes[page](app);
+tarhil:"<h2>صفحة الترحيلات تعمل</h2>",
 
-}
+khazna:"<h2>صفحة الخزنة تعمل</h2>",
 
-catch(e){
+market_shops:"<h2>صفحة محلات السوق تعمل</h2>",
 
-console.error(e);
-
-app.innerHTML=
-"خطأ داخل الصفحة";
-
-}
+employees:"<h2>صفحة الموظفين تعمل</h2>"
 
 };
 
+app.innerHTML =
+pages[page] || "صفحة غير موجودة";
 
-// بدون auth حالياً
-window.onload=
-function(){
+};
 
-navigate(
-"dashboard"
-);
+window.onload = function(){
+
+navigate("dashboard");
 
 };
