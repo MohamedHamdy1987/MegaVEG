@@ -1,37 +1,42 @@
-window.navigate = function(page){
+import { renderDashboard }
+from "./pages/dashboard.js";
 
-const app =
+window.navigate=
+async function(page){
+
+const app=
 document.getElementById("app");
 
-const pages = {
+if(page==="dashboard"){
 
-dashboard:"<h2>الرئيسية تعمل</h2>",
+try{
 
-customers:"<h2>صفحة العملاء تعمل</h2>",
+await renderDashboard(app);
 
-suppliers:"<h2>صفحة الموردين تعمل</h2>",
+}
 
-sales:"<h2>صفحة المبيعات تعمل</h2>",
+catch(e){
 
-invoices:"<h2>صفحة الفواتير تعمل</h2>",
+app.innerHTML=
+"dashboard crashed";
 
-tarhil:"<h2>صفحة الترحيلات تعمل</h2>",
+console.error(e);
 
-khazna:"<h2>صفحة الخزنة تعمل</h2>",
+}
 
-market_shops:"<h2>صفحة محلات السوق تعمل</h2>",
+return;
 
-employees:"<h2>صفحة الموظفين تعمل</h2>"
+}
+
+app.innerHTML=
+"زر "+page+" يعمل";
 
 };
 
-app.innerHTML =
-pages[page] || "صفحة غير موجودة";
+window.onload=function(){
 
-};
-
-window.onload = function(){
-
-navigate("dashboard");
+navigate(
+"dashboard"
+);
 
 };
