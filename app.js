@@ -6,8 +6,8 @@
 'use strict';
 
 // ── CONFIG ─────────────────────────────────────────────────
-const SUPABASE_URL = 'https://oawtdxkylwujcvdzfasn.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hd3RkeGt5bHd1amN2ZHpmYXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1MjMxMjcsImV4cCI6MjA5MjA5OTEyN30.1BvWh200IjumJ5v2JLh0bSZNhIgzQLrTrDSr_EJfFAQ';
+const SUPABASE_URL = 'https://ofysudebajyaskwhgfdq.supabase.co';
+const SUPABASE_ANON ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9meXN1ZGViYWp5YXNrd2hnZmRxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MDg4NDksImV4cCI6MjA5MjQ4NDg0OX0.gWX9ZgVaG0yhwHuYmfqzAjhFDnKLoaX3fpZdbAo1-UA';
 
 // ── Supabase Client ────────────────────────────────────────
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
