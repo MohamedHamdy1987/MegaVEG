@@ -1,5 +1,7 @@
-import { renderDashboard }
-from "./pages/dashboard.js";
+import {
+renderCustomersPage
+}
+from "./pages/customers.js";
 
 window.navigate=
 async function(page){
@@ -7,18 +9,18 @@ async function(page){
 const app=
 document.getElementById("app");
 
-if(page==="dashboard"){
+if(page==="customers"){
 
 try{
 
-await renderDashboard(app);
+await renderCustomersPage(app);
 
 }
 
 catch(e){
 
 app.innerHTML=
-"dashboard crashed";
+"customers crashed";
 
 console.error(e);
 
@@ -29,14 +31,14 @@ return;
 }
 
 app.innerHTML=
-"زر "+page+" يعمل";
+"زر يعمل";
 
 };
 
 window.onload=function(){
 
 navigate(
-"dashboard"
+"customers"
 );
 
 };
