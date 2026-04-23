@@ -1,37 +1,70 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient }
+from "https://esm.sh/@supabase/supabase-js@2";
+
 
 // ===============================
-// 🔐 INIT SUPABASE
+// 🔐 SUPABASE
 // ===============================
 
-const supabaseUrl = "https://koczjlhjprdyeeuxigiu.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvY3pqbGhqcHJkeWVldXhpZ2l1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5Mjg3NDAsImV4cCI6MjA5MjUwNDc0MH0.ywWLJVIfRKC4CxOeAoqaPU3Z6kVX3NJp-4jt2cKfa8I";
+const supabaseUrl =
+"https://koczjlhjprdyeeuxigiu.supabase.co";
+
+const supabaseKey =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvY3pqbGhqcHJkeWVldXhpZ2l1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5Mjg3NDAsImV4cCI6MjA5MjUwNDc0MH0.ywWLJVIfRKC4CxOeAoqaPU3Z6kVX3NJp-4jt2cKfa8I";
+
 
 export const supabase =
 createClient(
-  supabaseUrl,
-  supabaseKey
+supabaseUrl,
+supabaseKey
 );
 
+
 // ===============================
-// 👤 GET CURRENT USER
+// 👤 CURRENT USER
 // ===============================
 
 export async function getCurrentUser(){
 
-  const { data, error } =
-    await supabase.auth.getUser();
+try{
 
-  if(error){
-    console.error(error.message);
-    return null;
-  }
+const {
+data,
+error
+}
+=
+await supabase
+.auth
+.getUser();
 
-  return data?.user || null;
+if(error){
+
+console.error(
+error.message
+);
+
+return null;
+
 }
 
+return data?.user || null;
+
+}
+
+catch(e){
+
+console.error(e);
+
+return null;
+
+}
+
+}
+
+
+
 // ===============================
-// 📥 INSERT
+// INSERT
 // ===============================
 
 export async function dbInsert(
@@ -39,38 +72,43 @@ table,
 data
 ){
 
-  const user =
-    await getCurrentUser();
+const user=
+await getCurrentUser();
 
-  if(!user){
-    console.error("No user");
-    return false;
-  }
+if(!user){
+return false;
+}
 
-  const payload = {
-    ...data,
-    user_id: user.id
-  };
+const payload={
+...data,
+user_id:user.id
+};
 
-  const { error } =
-    await supabase
-    .from(table)
-    .insert(payload);
+const {
+error
+}
+=
+await supabase
+.from(table)
+.insert(payload);
 
-  if(error){
-    console.error(
-      "INSERT ERROR:",
-      error.message
-    );
-    return false;
-  }
+if(error){
 
-  return true;
+console.error(
+error.message
+);
+
+return false;
+}
+
+return true;
+
 }
 
 
+
 // ===============================
-// ✏️ UPDATE
+// UPDATE
 // ===============================
 
 export async function dbUpdate(
@@ -79,36 +117,44 @@ id,
 data
 ){
 
-  const user =
-    await getCurrentUser();
+const user=
+await getCurrentUser();
 
-  if(!user)
-    return false;
+if(!user){
+return false;
+}
 
-  const { error } =
-    await supabase
-    .from(table)
-    .update(data)
-    .eq("id", id)
-    .eq("user_id", user.id);
+const {
+error
+}
+=
+await supabase
+.from(table)
+.update(data)
+.eq("id",id)
+.eq(
+"user_id",
+user.id
+);
 
-  if(error){
+if(error){
 
-    console.error(
-      "UPDATE ERROR:",
-      error.message
-    );
+console.error(
+error.message
+);
 
-    return false;
-  }
+return false;
 
-  return true;
+}
+
+return true;
 
 }
 
 
+
 // ===============================
-// ❌ DELETE
+// DELETE
 // ===============================
 
 export async function dbDelete(
@@ -116,184 +162,201 @@ table,
 id
 ){
 
-  const user =
-    await getCurrentUser();
+const user=
+await getCurrentUser();
 
-  if(!user)
-    return false;
+if(!user){
+return false;
+}
 
-  const { error } =
-    await supabase
-    .from(table)
-    .delete()
-    .eq("id", id)
-    .eq("user_id", user.id);
+const {
+error
+}
+=
+await supabase
+.from(table)
+.delete()
+.eq("id",id)
+.eq(
+"user_id",
+user.id
+);
 
-  if(error){
+if(error){
 
-    console.error(
-      "DELETE ERROR:",
-      error.message
-    );
+console.error(
+error.message
+);
 
-    return false;
+return false;
 
-  }
+}
 
-  return true;
+return true;
 
 }
 
 
+
 // ===============================
-// 📤 SELECT
+// SELECT
 // ===============================
 
 export async function dbSelect(
 table
 ){
 
-  const user =
-    await getCurrentUser();
+const user=
+await getCurrentUser();
 
-  if(!user)
-    return [];
+if(!user){
+return [];
+}
 
-  const {
-    data,
-    error
-  } =
-  await supabase
-   .from(table)
-   .select("*")
-   .eq(
-     "user_id",
-     user.id
-   );
+const {
+data,
+error
+}
+=
+await supabase
+.from(table)
+.select("*")
+.eq(
+"user_id",
+user.id
+);
 
-  if(error){
+if(error){
 
-    console.error(
-      "SELECT ERROR:",
-      error.message
-    );
+console.error(
+error.message
+);
 
-    return [];
+return [];
 
-  }
+}
 
-  return data || [];
+return data||[];
 
 }
 
 
 
 // ===============================
-// 🧾 RPC
-// confirm_invoice_v2
+// RPC
 // ===============================
 
 export async function confirmInvoice(
 invoiceId
 ){
 
- const { error } =
- await supabase.rpc(
-   "confirm_invoice_v2",
-   {
-     p_invoice_id:
-     invoiceId
-   }
- );
+const {
+error
+}
+=
+await supabase.rpc(
+"confirm_invoice_v2",
+{
+p_invoice_id:
+invoiceId
+}
+);
 
- if(error){
+if(error){
 
-   console.error(
-    "CONFIRM ERROR:",
-    error.message
-   );
+console.error(
+error.message
+);
 
-   return false;
- }
+return false;
 
- return true;
+}
+
+return true;
 
 }
 
 
 
 // ===============================
-// 👥 CUSTOMER BALANCE
-// from customer_balances view
+// CUSTOMER BALANCE
 // ===============================
 
 export async function getCustomerBalance(
 customerId
 ){
 
- const { data, error } =
- await supabase
- .from(
-   "customer_balances"
- )
- .select("balance")
- .eq(
-   "customer_id",
-   customerId
- )
- .single();
+const {
+data,
+error
+}
+=
+await supabase
+.from(
+"customer_balances"
+)
+.select("balance")
+.eq(
+"customer_id",
+customerId
+)
+.single();
 
- if(error){
+if(error){
 
-   console.error(
-    "BALANCE ERROR:",
-    error.message
-   );
+console.error(
+error.message
+);
 
-   return 0;
- }
+return 0;
 
- return data?.balance || 0;
+}
+
+return data?.balance||0;
 
 }
 
 
 
 // ===============================
-// 📒 CUSTOMER LEDGER
+// CUSTOMER LEDGER
 // ===============================
 
 export async function getCustomerLedger(
 customerId
 ){
 
- const {
-   data,
-   error
- } =
- await supabase
- .from("customer_ledger")
- .select("*")
- .eq(
-   "customer_id",
-   customerId
- )
- .order(
-   "trx_date",
-   {ascending:true}
- );
+const {
+data,
+error
+}
+=
+await supabase
+.from(
+"customer_ledger"
+)
+.select("*")
+.eq(
+"customer_id",
+customerId
+)
+.order(
+"trx_date",
+{
+ascending:true
+}
+);
 
- if(error){
+if(error){
 
-   console.error(
-    "LEDGER ERROR:",
-    error.message
-   );
+console.error(
+error.message
+);
 
-   return [];
+return [];
 
- }
+}
 
- return data || [];
+return data||[];
 
 }
