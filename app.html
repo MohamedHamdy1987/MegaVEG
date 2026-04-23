@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
 
 <meta charset="UTF-8">
@@ -13,62 +12,84 @@ content="width=device-width,initial-scale=1.0">
 href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap"
 rel="stylesheet">
 
-<link
-rel="stylesheet"
+<link rel="stylesheet"
 href="assets/style.css">
 
 </head>
 
 <body>
 
-<!-- 🌌 Background -->
 <div class="bg"></div>
 
 
-<!-- 🔥 SIDEBAR -->
 <aside class="sidebar">
 
 <div class="logo">
-🍎
-<span>Market Pro</span>
+🍎 <span>Market Pro</span>
 </div>
 
 
 <nav class="menu">
 
-<button data-nav="dashboard">
+<button
+data-nav="dashboard"
+onclick="navigate('dashboard')">
 📊 الرئيسية
 </button>
 
-<button data-nav="invoices">
+
+<button
+data-nav="invoices"
+onclick="navigate('invoices')">
 📄 الفواتير
 </button>
 
-<button data-nav="sales">
+
+<button
+data-nav="sales"
+onclick="navigate('sales')">
 🛒 المبيعات
 </button>
 
-<button data-nav="customers">
+
+<button
+data-nav="customers"
+onclick="navigate('customers')">
 👥 العملاء
 </button>
 
-<button data-nav="suppliers">
+
+<button
+data-nav="suppliers"
+onclick="navigate('suppliers')">
 🚚 الموردين
 </button>
 
-<button data-nav="tarhil">
+
+<button
+data-nav="tarhil"
+onclick="navigate('tarhil')">
 📋 الترحيلات
 </button>
 
-<button data-nav="khazna">
+
+<button
+data-nav="khazna"
+onclick="navigate('khazna')">
 💰 الخزنة
 </button>
 
-<button data-nav="market_shops">
+
+<button
+data-nav="market_shops"
+onclick="navigate('market_shops')">
 🏬 محلات السوق
 </button>
 
-<button data-nav="employees">
+
+<button
+data-nav="employees"
+onclick="navigate('employees')">
 👷 الموظفين
 </button>
 
@@ -83,9 +104,7 @@ href="assets/style.css">
 
 
 
-<!-- 🔥 MAIN -->
 <main class="main">
-
 
 <header class="topbar">
 
@@ -94,7 +113,6 @@ href="assets/style.css">
 Dashboard
 </h3>
 </div>
-
 
 <div class="right">
 
@@ -112,28 +130,23 @@ class="search">
 </header>
 
 
-
 <section
 id="app"
 class="content fade-in">
 </section>
 
-
 </main>
 
 
 
-<!-- MODAL -->
 <div id="modal"
 class="modal hidden">
 </div>
 
+<div id="toast">
+</div>
 
-<!-- TOAST -->
-<div id="toast"></div>
 
-
-<!-- LOADER -->
 <div
 id="global-loader"
 class="loader hidden">
@@ -145,26 +158,25 @@ class="loader hidden">
 
 
 
-<!-- MOBILE NAV -->
 <div class="mobile-nav">
 
-<button data-nav="dashboard">
+<button onclick="navigate('dashboard')">
 🏠
 </button>
 
-<button data-nav="sales">
+<button onclick="navigate('sales')">
 🛒
 </button>
 
-<button data-nav="invoices">
+<button onclick="navigate('invoices')">
 📄
 </button>
 
-<button data-nav="customers">
+<button onclick="navigate('customers')">
 👥
 </button>
 
-<button data-nav="khazna">
+<button onclick="navigate('khazna')">
 💰
 </button>
 
@@ -172,18 +184,18 @@ class="loader hidden">
 
 
 
-<!-- ✅ FIX مهم -->
+<!-- مهم -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- APP -->
 <script
 type="module"
 src="app.js">
 </script>
 
+<!-- FIXED -->
 <script
 type="module"
-src="ui.js">
+src="core/ui.js">
 </script>
 
 </body>
