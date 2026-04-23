@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Market Pro</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/style.css">
+
+</head>
+
+<body>
+
+  <!-- 🌌 Animated Background -->
+  <div class="bg"></div>
+
+  <!-- 🔥 SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="logo">
+      🍎 <span>Market Pro</span>
+    </div>
+
+    <nav class="menu">
+
+      <button data-nav="dashboard">📊 الرئيسية</button>
+      <button data-nav="invoices">📄 الفواتير</button>
+      <button data-nav="sales">🛒 المبيعات</button>
+      <button data-nav="customers">👥 العملاء</button>
+      <button data-nav="suppliers">🚚 الموردين</button>
+      <button data-nav="tarhil">📋 الترحيلات</button>
+      <button data-nav="khazna">💰 الخزنة</button>
+      <button data-nav="market_shops">🏬 محلات السوق</button>
+      <button data-nav="employees">👷 الموظفين</button>
+
+    </nav>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+      <p>⚡ v2.0</p>
+    </div>
+
+  </aside>
+
+  <!-- 🔥 MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <div class="left">
+        <h3 id="page-title">Dashboard</h3>
+      </div>
+
+      <div class="right">
+
+        <!-- Search -->
+        <input type="text" placeholder="بحث..." class="search">
+
+        <!-- User -->
+        <div class="user">
+          👤
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- 🔥 CONTENT -->
+    <section id="app" class="content fade-in"></section>
+
+  </main>
+
+  <!-- 🔥 MODAL -->
+  <div id="modal" class="modal hidden"></div>
+
+  <!-- 🔥 TOAST -->
+  <div id="toast"></div>
+
+  <!-- 🔥 LOADING OVERLAY -->
+  <div id="global-loader" class="loader hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- 🔥 MOBILE NAV -->
+  <div class="mobile-nav">
+
+    <button data-nav="dashboard">🏠</button>
+    <button data-nav="sales">🛒</button>
+    <button data-nav="invoices">📄</button>
+    <button data-nav="customers">👥</button>
+    <button data-nav="khazna">💰</button>
+
+  </div>
+
+  <!-- 🔥 SCRIPTS -->
+  <script type="module" src="app.js"></script>
+  <script type="module" src="ui.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة سوق الخضار</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background: #f8fafc;
+      color: #111;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 20px;
+      color: #0f766e;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .btn {
+      margin-top: 20px;
+      padding: 14px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #14b8a6;
+      color: white;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 60px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+      <h1>نظام إدارة سوق الخضار والفواكه</h1>
+      <p>
+        إدارة الفواتير، المبيعات، الموردين، العملاء، الترحيلات والخزنة  
+        في نظام واحد سهل وسريع
+      </p>
+
+      <button class="btn btn-primary" onclick="goToApp()">
+        🚀 ابدأ الآن
+      </button>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features">
+
+      <div class="card">
+        <h3>📄 إدارة الفواتير</h3>
+        <p>إنشاء فواتير الموردين وإدارة الأصناف بسهولة</p>
+      </div>
+
+      <div class="card">
+        <h3>🛒 المبيعات</h3>
+        <p>بيع مباشر من الفواتير مع متابعة الباقي</p>
+      </div>
+
+      <div class="card">
+        <h3>👥 العملاء</h3>
+        <p>كشف حساب لحظي ويومية تلقائية</p>
+      </div>
+
+      <div class="card">
+        <h3>💰 الخزنة</h3>
+        <p>تحصيلات ومصروفات كاملة</p>
+      </div>
+
+      <div class="card">
+        <h3>🏬 محلات السوق</h3>
+        <p>حسابات بينك وبين التجار الآخرين</p>
+      </div>
+
+      <div class="card">
+        <h3>📊 تقارير</h3>
+        <p>لوحة تحكم تعرض كل الأرقام المهمة</p>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      © 2026 جميع الحقوق محفوظة
+    </div>
+
+  </div>
+
+  <script>
+    function goToApp() {
+      window.location.href = "app.html";
+    }
+  </script>
+
+</body>
+
+</html>
