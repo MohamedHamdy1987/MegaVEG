@@ -1,44 +1,43 @@
-import {
-renderCustomersPage
-}
-from "./pages/customers.js";
+import { renderDashboard } from "./pages/dashboard.js";
+import { renderCustomersPage } from "./pages/customers.js";
+import { renderSuppliersPage } from "./pages/suppliers.js";
 
-window.navigate=
-async function(page){
+const routes = {
+ dashboard: renderDashboard,
+ customers: renderCustomersPage,
+ suppliers: renderSuppliersPage
+};
 
-const app=
-document.getElementById("app");
+window.navigate = async function(page){
 
-if(page==="customers"){
+ const app =
+ document.getElementById("app");
 
-try{
+ try{
 
-await renderCustomersPage(app);
+   if(!routes[page]){
+     app.innerHTML="الصفحة غير مفعلة حالياً";
+     return;
+   }
 
-}
+   app.innerHTML="جار التحميل...";
 
-catch(e){
+   await routes[page](app);
 
-app.innerHTML=
-"customers crashed";
+ }
 
-console.error(e);
+ catch(e){
 
-}
+   console.error(e);
 
-return;
+   app.innerHTML="خطأ داخل الصفحة";
 
-}
-
-app.innerHTML=
-"زر يعمل";
+ }
 
 };
 
-window.onload=function(){
+window.onload = function(){
 
-navigate(
-"customers"
-);
+ navigate("dashboard");
 
 };
