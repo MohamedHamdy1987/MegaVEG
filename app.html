@@ -8,170 +8,234 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Market Pro">
   <meta name="mobile-web-app-capable" content="yes">
+
   <title>Market Pro</title>
+
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- تم تعديل png إلى jpg -->
+  <link rel="apple-touch-icon" href="icons/icon-192.jpg">
+
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="bg"></div>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="logo">
-      <div class="logo-icon">🍎</div>
-      <div>
-        <div class="logo-text">Market Pro</div>
-        <div class="logo-sub">نظام السوق الذكي</div>
-      </div>
-    </div>
+<div class="bg"></div>
 
-    <nav class="menu">
-      <div class="menu-section">
-        <div class="menu-label">الرئيسي</div>
-        <button data-nav="dashboard"><span class="nav-icon">📊</span> الرئيسية</button>
-      </div>
-      <div class="menu-section">
-        <div class="menu-label">العمليات</div>
-        <button data-nav="invoices"><span class="nav-icon">📄</span> الفواتير</button>
-        <button data-nav="sales"><span class="nav-icon">🛒</span> المبيعات</button>
-        <button data-nav="tarhil"><span class="nav-icon">📋</span> الترحيلات</button>
-      </div>
-      <div class="menu-section">
-        <div class="menu-label">الأطراف</div>
-        <button data-nav="customers"><span class="nav-icon">👥</span> العملاء</button>
-        <button data-nav="suppliers"><span class="nav-icon">🚚</span> الموردين</button>
-        <button data-nav="market_shops"><span class="nav-icon">🏬</span> محلات السوق</button>
-      </div>
-      <div class="menu-section">
-        <div class="menu-label">المالية</div>
-        <button data-nav="khazna"><span class="nav-icon">💰</span> الخزنة</button>
-        <button data-nav="financial"><span class="nav-icon">🏦</span> المركز المالي</button>
-        <button data-nav="partners"><span class="nav-icon">🤝</span> الشركاء</button>
-        <button data-nav="employees"><span class="nav-icon">👷</span> الموظفين</button>
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <span class="version-badge">⚡ v4.0</span>
-      <button class="btn-ghost btn btn-sm" onclick="signOut()">خروج</button>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-    <header class="topbar">
-      <h3 class="topbar-title" id="page-title">الرئيسية</h3>
-      <div class="search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="search" id="global-search" placeholder="بحث..." class="search" autocomplete="off">
-      </div>
-      <div class="topbar-actions">
-        <button class="icon-btn" onclick="navigate('financial')" title="المركز المالي">📈</button>
-        <button class="icon-btn" onclick="navigate('khazna')" title="الخزنة">💰</button>
-      </div>
-    </header>
-
-    <section id="app" class="content fade-in"></section>
-  </main>
-
-  <!-- MODAL -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-card" id="modal-card">
-      <div class="modal-handle"></div>
-      <div id="modal-body"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🍎</div>
+    <div>
+      <div class="logo-text">Market Pro</div>
+      <div class="logo-sub">نظام السوق الذكي</div>
     </div>
   </div>
 
-  <!-- TOAST -->
-  <div id="toast"></div>
+  <nav class="menu">
 
-  <!-- LOADER -->
-  <div id="global-loader" class="loader hidden">
-    <div class="spinner"></div>
-    <p style="color:var(--c-text-muted);font-size:13px;margin-top:8px;">جاري التحميل...</p>
-  </div>
-
-  <!-- PWA Install Banner -->
-  <div id="install-prompt" style="
-    display:none;position:fixed;bottom:80px;right:16px;left:16px;
-    background:linear-gradient(135deg,#021e14,#032e20);
-    border:1px solid rgba(20,184,166,0.3);border-radius:16px;
-    padding:16px;box-shadow:0 16px 48px rgba(0,0,0,0.5);z-index:900;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div style="font-size:36px;">📱</div>
-      <div style="flex:1;">
-        <div style="font-weight:700;font-size:15px;color:#f0fdf4;">ثبّت Market Pro</div>
-        <div style="font-size:12px;color:#a7f3d0;margin-top:2px;">تطبيق سريع يعمل بدون إنترنت</div>
-      </div>
+    <div class="menu-section">
+      <div class="menu-label">الرئيسي</div>
+      <button data-nav="dashboard">📊 الرئيسية</button>
     </div>
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button class="btn" style="flex:1;" onclick="installPWA()">📲 تثبيت</button>
-      <button class="btn btn-ghost btn-sm" onclick="dismissInstall()">لاحقاً</button>
-    </div>
-  </div>
 
-  <!-- MOBILE NAV -->
-  <nav class="mobile-nav">
-    <button data-nav="dashboard"><span class="nav-em">🏠</span><span class="nav-lbl">الرئيسية</span></button>
-    <button data-nav="sales"><span class="nav-em">🛒</span><span class="nav-lbl">المبيعات</span></button>
-    <button data-nav="invoices"><span class="nav-em">📄</span><span class="nav-lbl">الفواتير</span></button>
-    <button data-nav="customers"><span class="nav-em">👥</span><span class="nav-lbl">العملاء</span></button>
-    <button data-nav="khazna"><span class="nav-em">💰</span><span class="nav-lbl">الخزنة</span></button>
+    <div class="menu-section">
+      <div class="menu-label">العمليات</div>
+      <button data-nav="invoices">📄 الفواتير</button>
+      <button data-nav="sales">🛒 المبيعات</button>
+      <button data-nav="tarhil">📋 الترحيلات</button>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-label">الأطراف</div>
+      <button data-nav="customers">👥 العملاء</button>
+      <button data-nav="suppliers">🚚 الموردين</button>
+      <button data-nav="market_shops">🏬 محلات السوق</button>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-label">المالية</div>
+      <button data-nav="khazna">💰 الخزنة</button>
+      <button data-nav="financial">🏦 المركز المالي</button>
+      <button data-nav="partners">🤝 الشركاء</button>
+      <button data-nav="employees">👷 الموظفين</button>
+    </div>
+
   </nav>
 
-  <script>
-    // PWA Install
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if (!localStorage.getItem('pwa-dismissed')) {
-        setTimeout(() => { document.getElementById('install-prompt').style.display = 'block'; }, 4000);
-      }
-    });
-    window.installPWA = async function() {
-      if (!deferredPrompt) return;
-      document.getElementById('install-prompt').style.display = 'none';
-      deferredPrompt.prompt();
-      deferredPrompt = null;
-    };
-    window.dismissInstall = function() {
-      document.getElementById('install-prompt').style.display = 'none';
-      localStorage.setItem('pwa-dismissed', '1');
-    };
+  <div class="sidebar-footer">
+    <span class="version-badge">⚡ v4.0</span>
+    <button class="btn btn-sm" onclick="signOut()">خروج</button>
+  </div>
 
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-          reg.addEventListener('updatefound', () => {
-            const nw = reg.installing;
-            nw.addEventListener('statechange', () => {
-              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                const t = document.getElementById('toast');
-                if (t) {
-                  const el = document.createElement('div');
-                  el.className = 'toast info';
-                  el.innerHTML = '🔄 تحديث جديد – <button onclick="location.reload()" style="background:none;border:none;color:#93c5fd;cursor:pointer;font-weight:700;font-family:Cairo,sans-serif;text-decoration:underline;">تحديث الآن</button>';
-                  t.appendChild(el);
-                }
-              }
-            });
-          });
-        });
+</aside>
+
+
+<main class="main">
+
+<header class="topbar">
+  <h3 id="page-title">الرئيسية</h3>
+
+  <div class="search-wrap">
+    <input type="search" id="global-search" placeholder="بحث..." class="search">
+  </div>
+
+  <div class="topbar-actions">
+    <button onclick="navigate('financial')">📈</button>
+    <button onclick="navigate('khazna')">💰</button>
+  </div>
+</header>
+
+<section id="app" class="content fade-in"></section>
+
+</main>
+
+
+<div id="modal" class="modal hidden">
+  <div id="modal-body"></div>
+</div>
+
+<div id="toast"></div>
+
+<div id="global-loader" class="loader hidden">
+  <div class="spinner"></div>
+</div>
+
+
+<!-- Install Prompt -->
+<div id="install-prompt"
+style="
+display:none;
+position:fixed;
+bottom:80px;
+right:16px;
+left:16px;
+background:#022c22;
+border-radius:16px;
+padding:16px;
+z-index:900;
+">
+  <div style="font-weight:bold;">📱 ثبّت Market Pro</div>
+
+  <div style="margin-top:8px;">
+    يعمل كتطبيق حتى بدون إنترنت
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:12px;">
+    <button class="btn" onclick="installPWA()">تثبيت</button>
+    <button class="btn btn-sm" onclick="dismissInstall()">لاحقاً</button>
+  </div>
+</div>
+
+
+<nav class="mobile-nav">
+<button data-nav="dashboard">🏠</button>
+<button data-nav="sales">🛒</button>
+<button data-nav="invoices">📄</button>
+<button data-nav="customers">👥</button>
+<button data-nav="khazna">💰</button>
+</nav>
+
+
+
+<script>
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt",(e)=>{
+ e.preventDefault();
+ deferredPrompt=e;
+
+ if(!localStorage.getItem("pwa-dismissed")){
+   setTimeout(()=>{
+    document.getElementById("install-prompt").style.display="block";
+   },4000);
+ }
+});
+
+window.installPWA=async function(){
+ if(!deferredPrompt) return;
+
+ document.getElementById("install-prompt").style.display="none";
+
+ deferredPrompt.prompt();
+
+ deferredPrompt=null;
+};
+
+window.dismissInstall=function(){
+ document.getElementById("install-prompt").style.display="none";
+ localStorage.setItem("pwa-dismissed","1");
+};
+
+</script>
+
+
+<script>
+
+if("serviceWorker" in navigator){
+
+ window.addEventListener("load",()=>{
+
+   /* تم تعديل /sw.js إلى ./sw.js */
+   navigator.serviceWorker.register("./sw.js")
+
+   .then(reg=>{
+
+      reg.addEventListener("updatefound",()=>{
+
+       const nw=reg.installing;
+
+       nw.addEventListener("statechange",()=>{
+
+         if(
+           nw.state==="installed"
+           &&
+           navigator.serviceWorker.controller
+         ){
+
+          const t=document.getElementById("toast");
+
+          if(t){
+
+           const el=document.createElement("div");
+
+           el.className="toast";
+
+           el.innerHTML=
+           '🔄 تحديث جديد — <button onclick="location.reload()">تحديث</button>';
+
+           t.appendChild(el);
+
+          }
+
+         }
+
+       });
+
       });
-    }
 
-    window.signOut = async function() {
-      const { supabase } = await import('./data.js');
-      await supabase.auth.signOut();
-      window.location.href = 'index.html';
-    };
-  </script>
+   });
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script type="module" src="app.js"></script>
+ });
+
+}
+
+window.signOut=async function(){
+
+ const {supabase}=await import("./data.js");
+
+ await supabase.auth.signOut();
+
+ location.href="index.html";
+
+};
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script type="module" src="app.js"></script>
+
 </body>
 </html>
