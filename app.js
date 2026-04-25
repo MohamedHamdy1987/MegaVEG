@@ -57,13 +57,15 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     const user = await getCurrentUser();
 
-if (!user) {
- window.location.href="index.html";
- return;
-}
+    // رجعنا Auth gate كما كان
+    if (!user) {
+      window.location.href = "index.html";
+      return;
+    }
 
-    // Subscription check
-    const isActive = true;
+    // رجعنا Subscription check كما كان
+    const isActive = await checkSubscription();
+
     if (loader) loader.classList.add("hidden");
 
     if (!isActive) {
@@ -84,17 +86,17 @@ if (!user) {
     setupNavigation();
     setupSearch();
 
-    // Handle hash navigation (PWA shortcuts)
     const hash = window.location.hash.replace('#','');
     await navigate(routes[hash] ? hash : "dashboard");
 
   } catch (err) {
     console.error("INIT ERROR:", err);
     if (loader) loader.classList.add("hidden");
+
     app.innerHTML = `
       <div class="card" style="border-color:rgba(239,68,68,0.3);">
         <h3 style="color:#f87171;">⚠️ خطأ في تشغيل التطبيق</h3>
-        <p style="color:var(--c-text-muted);margin-top:8px;">${err.message||''}</p>
+        <p style="color:var(--c-text-muted);margin-top:8px;">${err.message || ''}</p>
         <button class="btn btn-ghost btn-sm" style="margin-top:16px;" onclick="location.reload()">🔄 إعادة المحاولة</button>
       </div>`;
   }
@@ -102,45 +104,42 @@ if (!user) {
 
 // ── Navigate ─────────────────────────────────────────────
 window.navigate = async function(page) {
-  const app    = document.getElementById("app");
-  const loader = document.getElementById("global-loader");
+  const app = document.getElementById("app");
 
   try {
     if (!routes[page]) {
-      console.warn("Route not found:", page);
       app.innerHTML = `<div class="card"><h3>الصفحة غير موجودة: ${page}</h3></div>`;
       return;
     }
 
-    // Show skeleton instantly
     app.innerHTML = `
       <div>
         <div class="skeleton skeleton-title"></div>
         ${[0,1,2,3].map(()=>`<div class="skeleton skeleton-card"></div>`).join('')}
       </div>`;
+
     app.classList.remove("fade-in");
 
     await routes[page](app);
 
-    // Animate in
     app.classList.add("fade-in");
     setActive(page);
     updateTitle(page);
 
-    // Update URL hash without reload
-    window.history.replaceState(null, '', '#' + page);
+    window.history.replaceState(null,'','#'+page);
 
-    // Scroll to top
-    app.scrollTo({ top:0, behavior:'smooth' });
+    app.scrollTo({top:0,behavior:'smooth'});
 
-  } catch (err) {
-    console.error("NAV ERROR [" + page + "]:", err);
+  } catch(err) {
+    console.error("NAV ERROR ["+page+"]:", err);
+
     app.innerHTML = `
       <div class="card" style="border-color:rgba(239,68,68,0.3);">
         <h3 style="color:#f87171;">⚠️ خطأ في تحميل الصفحة</h3>
         <p style="color:var(--c-text-muted);margin-top:8px;font-size:13px;">${err.message||''}</p>
         <button class="btn btn-sm btn-ghost" style="margin-top:16px;" onclick="navigate('dashboard')">🏠 الرئيسية</button>
       </div>`;
+
     toast("خطأ في تحميل الصفحة: " + page, "error");
   }
 };
@@ -150,7 +149,7 @@ function setupNavigation() {
   document.querySelectorAll("[data-nav]").forEach(btn => {
     btn.addEventListener("click", () => {
       const page = btn.getAttribute("data-nav");
-      if (page) navigate(page);
+      if(page) navigate(page);
     });
   });
 }
@@ -158,46 +157,63 @@ function setupNavigation() {
 // ── Active State ─────────────────────────────────────────
 function setActive(page) {
   document.querySelectorAll("[data-nav]").forEach(btn => {
-    btn.classList.toggle("active", btn.getAttribute("data-nav") === page);
+    btn.classList.toggle(
+      "active",
+      btn.getAttribute("data-nav") === page
+    );
   });
 }
 
 // ── Title ────────────────────────────────────────────────
 function updateTitle(page) {
   const el = document.getElementById("page-title");
-  if (el) el.textContent = PAGE_TITLES[page] || "Market Pro";
-  document.title = (PAGE_TITLES[page]||'Market Pro') + " – Market Pro";
+  if(el) el.textContent = PAGE_TITLES[page] || "Market Pro";
+
+  document.title =
+    (PAGE_TITLES[page] || 'Market Pro') +
+    " – Market Pro";
 }
 
 // ── Global Search ────────────────────────────────────────
 function setupSearch() {
   const searchEl = document.getElementById("global-search");
-  if (!searchEl) return;
+  if(!searchEl) return;
 
   let debounce;
-  searchEl.addEventListener("input", (e) => {
+
+  searchEl.addEventListener("input",(e)=>{
     clearTimeout(debounce);
-    debounce = setTimeout(() => {
-      const q = e.target.value.trim();
-      if (q.length >= 2) handleGlobalSearch(q);
-    }, 350);
+
+    debounce=setTimeout(()=>{
+      const q=e.target.value.trim();
+      if(q.length>=2) handleGlobalSearch(q);
+    },350);
   });
 
-  searchEl.addEventListener("keydown", e => {
-    if (e.key === "Escape") { searchEl.value = ''; searchEl.blur(); }
+  searchEl.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){
+      searchEl.value='';
+      searchEl.blur();
+    }
   });
 }
 
-async function handleGlobalSearch(q) {
-  // نوجه للعملاء عند البحث – أبسط سلوك مفيد
+async function handleGlobalSearch(q){
   await navigate("customers");
-  if (window.filterCustomers) window.filterCustomers(q);
+
+  if(window.filterCustomers)
+    window.filterCustomers(q);
 }
 
 // ── Online/Offline Indicator ─────────────────────────────
-window.addEventListener("online", () => {
-  toast("✅ تم استعادة الاتصال بالإنترنت", "success");
+window.addEventListener("online",()=>{
+  toast("✅ تم استعادة الاتصال بالإنترنت","success");
 });
-window.addEventListener("offline", () => {
-  toast("📡 لا يوجد اتصال – بعض الميزات قد لا تعمل", "warning", 6000);
+
+window.addEventListener("offline",()=>{
+  toast(
+   "📡 لا يوجد اتصال – بعض الميزات قد لا تعمل",
+   "warning",
+   6000
+  );
 });
