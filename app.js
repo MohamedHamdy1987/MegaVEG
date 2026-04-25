@@ -57,9 +57,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     const user = await getCurrentUser();
     if (!user) {
-      window.location.href = "index.html";
-      return;
-    }
+ console.warn("Guest mode test");
+ // window.location.href="index.html";
+ // return;
+}
 
     // Subscription check
     const isActive = await checkSubscription();
