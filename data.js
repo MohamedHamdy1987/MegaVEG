@@ -15,15 +15,22 @@ export const supabase = createClient(
 // ===============================
 // AUTH
 // ===============================
-export async function getCurrentUser() {
-  const { data, error } =
-    await supabase.auth.getUser();
+export async function getCurrentUser(){
 
-  if (error) return null;
+ const { data: sessionData } =
+ await supabase.auth.getSession();
 
-  return data?.user || null;
+ console.log("SESSION:",sessionData);
+
+ if(sessionData?.session?.user){
+   return sessionData.session.user;
+ }
+
+ const { data } =
+ await supabase.auth.getUser();
+
+ return data?.user || null;
 }
-
 // ===============================
 // INSERT
 // ===============================
