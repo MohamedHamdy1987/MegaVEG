@@ -56,10 +56,10 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (loader) loader.classList.remove("hidden");
 
     const user = await getCurrentUser();
-    if (!user) {
- console.warn("Guest mode test");
- // window.location.href="index.html";
- // return;
+
+if (!user) {
+ window.location.href="index.html";
+ return;
 }
 
     // Subscription check
