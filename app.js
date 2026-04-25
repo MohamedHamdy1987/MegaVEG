@@ -63,7 +63,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 }
 
     // Subscription check
-    const isActive = await checkSubscription();
+    const isActive = true;
     if (loader) loader.classList.add("hidden");
 
     if (!isActive) {
