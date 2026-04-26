@@ -1,0 +1,472 @@
+index.html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Market Pro – نظام إدارة سوق الخضار والفواكه</title>
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#064e3b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Cairo',sans-serif;
+background:linear-gradient(135deg,#064e3b 0%,#022c22 100%);
+color:#f0fdf4;
+min-height:100vh;
+overflow-x:hidden;
+}
+
+.bg-pattern{
+position:fixed;
+inset:0;
+background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='rgba(255,255,255,0.02)'/%3E%3C/svg%3E");
+pointer-events:none;
+z-index:0;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:20px;
+position:relative;
+z-index:1;
+}
+
+.hero{
+text-align:center;
+padding:80px 20px 60px;
+}
+
+.badge{
+display:inline-block;
+background:rgba(20,184,166,.2);
+color:#5eead4;
+padding:8px 20px;
+border-radius:50px;
+font-size:14px;
+margin-bottom:20px;
+border:1px solid rgba(94,234,212,.3);
+}
+
+.hero h1{
+font-size:52px;
+line-height:1.2;
+margin-bottom:20px;
+background:linear-gradient(135deg,#5eead4,#a3e635);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.hero p{
+font-size:20px;
+color:#a7f3d0;
+margin-bottom:30px;
+max-width:700px;
+margin-left:auto;
+margin-right:auto;
+}
+
+.btn{
+display:inline-block;
+padding:16px 40px;
+border:none;
+border-radius:50px;
+font-size:18px;
+font-weight:700;
+cursor:pointer;
+transition:.3s;
+font-family:'Cairo';
+margin:8px;
+}
+
+.btn-primary{
+background:linear-gradient(135deg,#14b8a6,#22c55e);
+color:#022c22;
+box-shadow:0 8px 30px rgba(20,184,166,.3);
+}
+
+.btn-primary:hover{
+transform:translateY(-3px);
+}
+
+.btn-install{
+background:rgba(255,255,255,.08);
+color:#5eead4;
+border:1px solid rgba(94,234,212,.3);
+display:none;
+}
+
+#authSection {
+  display: none;
+  max-width: 400px;
+  margin: 60px auto;
+}
+
+#authSection .card {
+  background: rgba(255,255,255,.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.08);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+#authSection label {
+  display: block;
+  margin-bottom: 5px;
+  color: #a7f3d0;
+  font-size: 14px;
+  text-align: right;
+}
+
+#authSection input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: white;
+  font-family: 'Cairo';
+  font-size: 16px;
+}
+
+.section-title{
+text-align:center;
+font-size:32px;
+margin:60px 0 30px;
+color:#5eead4;
+}
+
+.features{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:24px;
+}
+
+.card{
+background:rgba(255,255,255,.04);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.08);
+padding:30px;
+border-radius:20px;
+text-align:center;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-8px);
+background:rgba(255,255,255,.08);
+}
+
+.card .icon{
+font-size:48px;
+margin-bottom:15px;
+}
+
+.card h3{
+color:#5eead4;
+margin-bottom:10px;
+}
+
+.card p{
+color:#a7f3d0;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+margin:40px 0;
+}
+
+.stat-card{
+background:rgba(255,255,255,.04);
+backdrop-filter:blur(20px);
+padding:25px;
+border-radius:20px;
+text-align:center;
+}
+
+.number{
+font-size:40px;
+font-weight:700;
+color:#5eead4;
+}
+
+.label{
+color:#a7f3d0;
+font-size:14px;
+}
+
+#netStatus{
+text-align:center;
+padding:18px;
+font-size:15px;
+color:#5eead4;
+}
+
+.footer{
+text-align:center;
+padding:40px;
+color:#6b7280;
+border-top:1px solid rgba(255,255,255,.05);
+margin-top:60px;
+}
+
+@media(max-width:768px){
+.hero h1{
+font-size:32px;
+}
+
+.hero p{
+font-size:16px;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="bg-pattern"></div>
+
+<div class="container">
+
+<div id="heroSection" class="hero">
+<div class="badge">
+⚡ النظام الأذكى لأسواق الخضار والفواكه
+</div>
+<h1>
+اعرف ربحك الحقيقي<br>
+في لحظة
+</h1>
+<p>
+اعرف عمولتك الصافية • اعرف حقوق الشركاء • اعرف رصيد كل عميل
+<br>
+اعمل جرد مالي في أي لحظة • تقارير يومية وشهرية وسنوية
+</p>
+<button class="btn btn-primary" onclick="handleStart()">
+🚀 ابدأ الآن مجاناً
+</button>
+<button id="installBtn" class="btn btn-install">
+📲 تنزيل التطبيق
+</button>
+</div>
+
+<div id="authSection">
+<div class="card">
+<h3 style="color:#5eead4; margin-bottom:20px;">تسجيل الدخول</h3>
+<div style="margin-bottom:15px;">
+<label for="email">البريد الإلكتروني</label>
+<input type="email" id="email" placeholder="example@mail.com">
+</div>
+<div style="margin-bottom:20px;">
+<label for="password">كلمة المرور</label>
+<input type="password" id="password" placeholder="********">
+</div>
+<button class="btn btn-primary" onclick="login()" style="width:100%;">تسجيل الدخول</button>
+<p style="margin-top:15px; font-size:14px; color:#a7f3d0;">
+<button onclick="showHero()" style="background:none;border:none;color:#5eead4;cursor:pointer;font-weight:700;">← العودة للصفحة الرئيسية</button>
+</p>
+</div>
+</div>
+
+<div class="stats">
+<div class="stat-card">
+<div class="number">🍎</div>
+<div class="label">إدارة الفواتير والمبيعات</div>
+</div>
+<div class="stat-card">
+<div class="number">💰</div>
+<div class="label">معرفة العمولة الصافية</div>
+</div>
+<div class="stat-card">
+<div class="number">👥</div>
+<div class="label">حسابات الشركاء الكاملة</div>
+</div>
+<div class="stat-card">
+<div class="number">🏬</div>
+<div class="label">محلات السوق وحقوق الملكية</div>
+</div>
+</div>
+
+<div class="section-title">
+كل ما تحتاجه في نظام واحد
+</div>
+
+<div class="features">
+
+<div class="card">
+<div class="icon">📄</div>
+<h3>الفواتير</h3>
+<p>إنشاء فواتير الموردين وإدارة الأصناف واعتمادها تلقائياً</p>
+</div>
+
+<div class="card">
+<div class="icon">🛒</div>
+<h3>المبيعات</h3>
+<p>بيع مباشر من الفواتير كاش وآجل ومحلات</p>
+</div>
+
+<div class="card">
+<div class="icon">👥</div>
+<h3>العملاء</h3>
+<p>كشف حساب لحظي وترحيلات تلقائية</p>
+</div>
+
+<div class="card">
+<div class="icon">🏬</div>
+<h3>محلات السوق</h3>
+<p>حسابات بينك وبين التجار</p>
+</div>
+
+<div class="card">
+<div class="icon">💰</div>
+<h3>الخزنة</h3>
+<p>تحصيلات ومصروفات كاملة</p>
+</div>
+
+<div class="card">
+<div class="icon">📊</div>
+<h3>الجرد المالي</h3>
+<p>اعرف حقوق الشركاء وصافي أرباحك</p>
+</div>
+
+<div class="card">
+<div class="icon">👷</div>
+<h3>الشركاء والموظفين</h3>
+<p>صلاحيات متعددة وحسابات جارية</p>
+</div>
+
+<div class="card">
+<div class="icon">📋</div>
+<h3>كشف التقادم</h3>
+<p>تقرير أعمار الديون للعملاء</p>
+</div>
+
+</div>
+
+<div id="netStatus">
+🟢 متصل
+</div>
+
+<div class="footer">
+© 2026 Market Pro – جميع الحقوق محفوظة
+</div>
+
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const supabaseUrl = "https://xetbfyhcazqudmoqkqub.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhldGJmeWhjYXpxdWRtb3FrcXViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDg3OTQsImV4cCI6MjA5MjUyNDc5NH0.3P16_0mdi9doQhR5SXtR0HIo6N752sxPJCpK1YShilw";
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    storage: window.localStorage,
+    persistSession: true,
+    detectSessionInUrl: true,
+    autoRefreshToken: true
+  }
+});
+
+// تهيئة: إذا كان المستخدم مسجلاً، انتقل للتطبيق مباشرة
+(async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    window.location.href = "app.html";
+    return;
+  }
+  // إذا كانت الصفحة بها هاش (رابط تأكيد بريد إلكتروني) فسيتم معالجته
+  if (window.location.hash) {
+    const { data, error } = await supabase.auth.getSessionFromUrl();
+    if (data?.session) {
+      window.location.href = "app.html";
+    }
+  }
+})();
+
+function showHero() {
+  document.getElementById('heroSection').style.display = 'block';
+  document.getElementById('authSection').style.display = 'none';
+}
+
+function showAuth() {
+  document.getElementById('heroSection').style.display = 'none';
+  document.getElementById('authSection').style.display = 'block';
+}
+
+window.handleStart = function() {
+  showAuth();
+};
+
+window.login = async function() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  if (!email || !password) {
+    alert('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+    return;
+  }
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    alert('فشل تسجيل الدخول: ' + error.message);
+    return;
+  }
+  window.location.href = "app.html";
+};
+
+window.goToApp = function() {
+  window.location.href = "app.html";
+};
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js');
+}
+
+function updateStatus(){
+  const el = document.getElementById('netStatus');
+  if (navigator.onLine){
+    el.innerHTML="🟢 متصل";
+  } else {
+    el.innerHTML="🔴 بدون إنترنت";
+  }
+}
+
+window.addEventListener('online',updateStatus);
+window.addEventListener('offline',updateStatus);
+updateStatus();
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  document.getElementById('installBtn').style.display='inline-block';
+});
+
+document.getElementById('installBtn').addEventListener('click',async()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;
+});
+</script>
+
+</body>
+</html>
