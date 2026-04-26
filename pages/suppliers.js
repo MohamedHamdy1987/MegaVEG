@@ -67,7 +67,6 @@ submitLabel:'حفظ',
 onSubmit:async(vals)=>{
 await dbInsert('suppliers',{
 name:vals.name,
-phone:vals.phone||null
 });
 toast('تم إضافة المورد','success');
 navigate('suppliers');
