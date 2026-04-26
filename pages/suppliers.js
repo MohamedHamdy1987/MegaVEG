@@ -61,7 +61,6 @@ inputModal({
 title:'إضافة مورد',
 fields:[
 {id:'name',label:'اسم المورد',type:'text',required:true},
-{id:'phone',label:'الهاتف',type:'tel'}
 ],
 submitLabel:'حفظ',
 onSubmit:async(vals)=>{
