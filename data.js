@@ -64,8 +64,7 @@ table,
 data
 ){
 
-const user=
-await getCurrentUser();
+const user=await getCurrentUser();
 
 if(!user){
 return null;
@@ -76,26 +75,19 @@ const payload={
 user_id:user.id
 };
 
-const {
-data:inserted,
-error
-}=await supabase
+const { error } = await supabase
 .from(table)
-.insert(payload)
-.select()
-.single();
+.insert(payload);
 
 if(error){
-console.error(
-error.message
-);
+alert(error.message);   // يظهر الخطأ الحقيقي
+console.error(error.message);
 return null;
 }
 
-return inserted;
+return payload;
 
 }
-
 export async function dbUpdate(
 table,
 id,
