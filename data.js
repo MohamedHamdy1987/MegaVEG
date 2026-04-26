@@ -5,7 +5,7 @@ const supabaseUrl=
 'https://xetbfyhcazqudmoqkqub.supabase.co';
 
 const supabaseKey=
-'ANON_KEY';
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhldGJmeWhjYXpxdWRtb3FrcXViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NDg3OTQsImV4cCI6MjA5MjUyNDc5NH0.3P16_0mdi9doQhR5SXtR0HIo6N752sxPJCpK1YShilw';
 
 export const supabase=
 createClient(
