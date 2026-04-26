@@ -339,7 +339,7 @@ if(error){
 }
 
 toast('تمت الإضافة','success');
-openInvoice(invoiceId);
+location.reload();
 
 }
 toast('تمت الإضافة','success');
