@@ -310,15 +310,27 @@ fields:[
 ],
 submitLabel:'حفظ',
 onSubmit:async(vals)=>{
-await supabase
+onSubmit: async(vals)=>{
+
+const { error } = await supabase
 .from('invoice_products')
 .insert({
-invoice_id:invoiceId,
-name:vals.name,
-qty:vals.qty,
-sold:0,
-returned:0
+  invoice_id: invoiceId,
+  name: vals.name,
+  qty: vals.qty,
+  sold: 0,
+  returned: 0
 });
+
+if(error){
+  alert(error.message);
+  throw error;
+}
+
+toast('تمت الإضافة','success');
+openInvoice(invoiceId);
+
+}
 toast('تمت الإضافة','success');
 openInvoice(invoiceId);
 }
