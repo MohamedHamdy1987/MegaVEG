@@ -305,8 +305,19 @@ window.openAddProduct=async function(invoiceId){
 inputModal({
 title:'إضافة صنف',
 fields:[
-{id:'name',label:'اسم',type:'text'},
-{id:'qty',label:'كمية',type:'number'}
+{
+id:'name',
+label:'اسم',
+type:'text',
+required:true
+},
+{
+id:'qty',
+label:'كمية',
+type:'number',
+required:true,
+min:1
+}
 ],
 submitLabel:'حفظ',
 onSubmit:async(vals)=>{
