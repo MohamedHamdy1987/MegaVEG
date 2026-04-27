@@ -67,6 +67,7 @@ onSubmit:async(vals)=>{
 await dbInsert('suppliers',{
 name:vals.name,
 });
+  closeModal();
 toast('تم إضافة المورد','success');
 navigate('suppliers');
 }
