@@ -105,15 +105,22 @@ ${fieldsHtml}
 <button onclick='closeModal()'>إلغاء</button>
 `,{preventClose:true});
 /* dynamic hide/show fields */
+/* dynamic hide/show الصحيح */
 
-const saleTypeEl =
-document.querySelector('[name="sale_type"]');
+const saleTypeEl=
+document.getElementById(
+'ifield-sale_type'
+);
 
-const customerEl =
-document.querySelector('[name="customer_id"]')?.closest('.field');
+const customerWrap=
+document.getElementById(
+'ifield-customer_id'
+)?.parentElement;
 
-const shopEl =
-document.querySelector('[name="shop_id"]')?.closest('.field');
+const shopWrap=
+document.getElementById(
+'ifield-shop_id'
+)?.parentElement;
 
 function toggleSaleFields(){
 
@@ -123,28 +130,28 @@ function toggleSaleFields(){
 
  if(v==="cash"){
 
-   if(customerEl)
-     customerEl.style.display="none";
+   if(customerWrap)
+    customerWrap.style.display='none';
 
-   if(shopEl)
-     shopEl.style.display="none";
+   if(shopWrap)
+    shopWrap.style.display='none';
  }
 
  if(v==="credit"){
 
-   if(customerEl)
-     customerEl.style.display="block";
+   if(customerWrap)
+    customerWrap.style.display='block';
 
-   if(shopEl)
-     shopEl.style.display="block";
+   if(shopWrap)
+    shopWrap.style.display='block';
  }
 
 }
 
 if(saleTypeEl){
  saleTypeEl.addEventListener(
-   "change",
-   toggleSaleFields
+  'change',
+  toggleSaleFields
  );
  toggleSaleFields();
 }
