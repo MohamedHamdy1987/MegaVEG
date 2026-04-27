@@ -101,12 +101,118 @@ modal(`
 <h3>${config.title}</h3>
 ${fieldsHtml}
 <div id='input-error' style='display:none'></div>
-<button id='input-submit'>${config.submitLabel||'حفظ'}</button>
-<button onclick='closeModal()'>إلغاء</button>
+<button id='input-submit'>
+${config.submitLabel||'حفظ'}
+</button>
+<button onclick='closeModal()'>
+إلغاء
+</button>
 `,{preventClose:true});
 
 const submitBtn=document.getElementById('input-submit');
 const errorDiv=document.getElementById('input-error');
+
+/* محلي وليس global */
+let busy=false;
+
+function showError(msg){
+errorDiv.style.display='block';
+errorDiv.textContent=msg;
+}
+
+submitBtn.onclick=async()=>{
+
+/* منع double click فقط لهذه النافذة */
+if(busy) return;
+busy=true;
+
+const values={};
+let valid=true;
+
+errorDiv.style.display='none';
+
+for(const f of config.fields){
+
+const fid=safeId(f.id);
+
+const el=document.getElementById(
+`ifield-${fid}`
+);
+
+if(!el) continue;
+
+const raw=el.value.trim();
+
+if(f.required&&!raw){
+showError(`${f.label} مطلوب`);
+valid=false;
+break;
+}
+
+if(f.type==='number'&&raw){
+
+const num=parseFloat(raw);
+
+if(isNaN(num)){
+showError('رقم غير صحيح');
+valid=false;
+break;
+}
+
+values[f.id]=num;
+
+}else{
+
+values[f.id]=raw;
+
+}
+
+}
+
+if(!valid){
+busy=false;
+return;
+}
+
+submitBtn.disabled=true;
+
+try{
+
+await config.onSubmit(values);
+
+}
+catch(err){
+
+showError(
+err?.message||'خطأ'
+);
+
+submitBtn.disabled=false;
+
+}
+finally{
+
+busy=false;
+
+}
+
+};
+
+setTimeout(()=>{
+
+const first=document.getElementById(
+`ifield-${safeId(
+config.fields[0]?.id
+)}`
+);
+
+if(first){
+first.focus();
+}
+
+},120);
+
+}
 
 function showError(msg){
 errorDiv.style.display='block';
