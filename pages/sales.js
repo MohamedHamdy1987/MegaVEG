@@ -1,440 +1,669 @@
-import { supabase, dbUpdate, addAuditLog, sellProductAtomic, ensureUser } from "../data.js";
-import { toast, inputModal, formatCurrency, formatDate } from "../ui.js";
+import {
+supabase,
+dbUpdate,
+addAuditLog,
+sellProductAtomic,
+ensureUser
+} from "../data.js";
 
-// مرتجع المورد (يرد كمية فقط قبل إغلاق الفاتورة)
-async function returnProductAtomic(productId, qty) {
-  const user = await ensureUser();
+import {
+toast,
+inputModal,
+formatDate
+} from "../ui.js";
 
-  const { error } = await supabase.rpc("return_product_atomic", {
-    p_product_id: productId,
-    p_qty: qty,
-    p_user_id: user.id
-  });
 
-  if (error) return { success:false, error:error.message };
+async function returnProductAtomic(productId,qty){
 
-  return { success:true };
+const user=await ensureUser();
+
+const {error}=await supabase.rpc(
+"return_product_atomic",
+{
+p_product_id:productId,
+p_qty:qty,
+p_user_id:user.id
 }
+);
+
+if(error){
+return {
+success:false,
+error:error.message
+};
+}
+
+return {success:true};
+
+}
+
+
 
 export async function renderSalesPage(app){
-  const user = await ensureUser();
 
-  const { data: invoices } = await supabase
-    .from("invoices")
-    .select("*")
-    .eq("user_id",user.id)
-    .eq("status","confirmed")
-    .order("date",{ascending:false});
+const user=await ensureUser();
 
-  app.innerHTML=`
-    <div class="page-header">
-      <div class="page-header-left">
-        <div class="page-title">🛒 المبيعات</div>
-        <div class="page-subtitle">${(invoices||[]).length} فاتورة مفتوحة للبيع</div>
-      </div>
-    </div>
+const {data:invoices}=await supabase
+.from("invoices")
+.select("*")
+.eq("user_id",user.id)
+.eq("status","confirmed")
+.order("date",{ascending:false});
 
-    ${
-      !(invoices||[]).length
-      ? `
-      <div class="empty-state">
-        <div class="empty-icon">📭</div>
-        <div class="empty-title">لا توجد فواتير مفتوحة</div>
-      </div>`
-      :
-      (invoices||[]).map(inv=>`
-      <div class="card" onclick="openSalesInvoice('${inv.id}')" style="cursor:pointer">
-        <div style="display:flex;justify-content:space-between">
-          <div>
-            <div style="font-weight:700">🚚 ${inv.supplier_name}</div>
-            <div style="font-size:12px;color:var(--c-text-muted)">
-              ${formatDate(inv.date)}
-            </div>
-          </div>
-          <button class="btn btn-sm">بيع →</button>
-        </div>
-      </div>
-      `).join('')
-    }
-  `;
+app.innerHTML=`
+
+<div class="page-header">
+<div class="page-title">
+🛒 المبيعات
+</div>
+</div>
+
+${
+!(invoices||[]).length
+?
+
+`<div class="card">
+لا توجد فواتير مفتوحة
+</div>`
+
+:
+
+(invoices||[]).map(inv=>`
+
+<div class="card"
+onclick="openSalesInvoice('${inv.id}')">
+
+<div style="display:flex;justify-content:space-between">
+
+<div>
+<div style="font-weight:700">
+${inv.supplier_name}
+</div>
+
+<div>
+${formatDate(inv.date)}
+</div>
+
+</div>
+
+<button class="btn">
+بيع
+</button>
+
+</div>
+
+</div>
+
+`).join('')
 }
 
-window.openSalesInvoice = async function(invoiceId){
+`;
 
-  const app=document.getElementById("app");
-
-  const [
-    {data:invoice},
-    {data:products}
-  ] = await Promise.all([
-    supabase.from("invoices").select("*").eq("id",invoiceId).single(),
-    supabase.from("invoice_products").select("*").eq("invoice_id",invoiceId).order("name")
-  ]);
-
-  const sold=(products||[]).reduce((s,p)=>s+Number(p.sold||0),0);
-  const rem=(products||[]).reduce(
-    (s,p)=>s+((p.qty||0)-(p.sold||0)-(p.returned||0)),0
-  );
-
-  app.innerHTML=`
-   <button class="btn btn-ghost btn-sm"
-      onclick="navigate('sales')">← رجوع</button>
-
-   <div class="page-header">
-     <div class="page-title">🛒 ${invoice.supplier_name}</div>
-     <div class="page-subtitle">
-       مباع ${sold} • متبقي ${rem}
-     </div>
-   </div>
-
-   ${renderProducts(products,invoiceId)}
-  `;
-}
-
-function renderProducts(products,invoiceId){
-
- if(!products?.length){
-   return `<div class="card">لا توجد أصناف</div>`;
- }
-
- return products.map(p=>{
-
-   const rem=(p.qty||0)-(p.sold||0)-(p.returned||0);
-
-   return `
-   <div class="card">
-      <div style="display:flex;justify-content:space-between">
-         <div>
-            <div style="font-weight:700">📦 ${p.name}</div>
-            <div style="font-size:12px;color:var(--c-text-muted)">
-              الكمية ${p.qty}
-              | مباع ${p.sold||0}
-              | مرتجع ${p.returned||0}
-            </div>
-         </div>
-
-         <div style="font-weight:800">
-           متبقي ${rem}
-         </div>
-      </div>
-
-      <div style="display:flex;gap:8px;margin-top:14px">
-       ${
-         rem>0
-         ? `<button class="btn"
-             onclick="sellProduct('${p.id}','${invoiceId}')">
-             💰 بيع
-           </button>`
-         :`<span class="badge badge-red">نفذ</span>`
-       }
-
-       ${
-         rem>0
-         ? `<button class="btn btn-warning btn-sm"
-             onclick="returnProduct('${p.id}','${invoiceId}')">
-             ↩️ رفع مورد
-            </button>`
-         :''
-       }
-      </div>
-   </div>
-   `;
-
- }).join('');
 }
 
 
-// ======================================
-// البيع الكامل (Cash / Credit / Shop)
-// ======================================
-window.sellProduct = async function(productId,invoiceId){
 
- if(window._saleLock){
-   toast("عملية جارية...","warning");
-   return;
- }
+window.openSalesInvoice=
+async function(invoiceId){
 
- const [
-   {data:customers},
-   {data:shops}
- ]=await Promise.all([
-   supabase.from("customers").select("id,full_name"),
-   supabase.from("market_shops").select("id,name")
- ]);
+const app=
+document.getElementById(
+"app"
+);
 
- inputModal({
-   title:"💰 تسجيل بيع",
+const[
+{data:invoice},
+{data:products}
+]=await Promise.all([
 
-   fields:[
-    {
-      id:"qty",
-      label:"الكمية",
-      type:"number",
-      required:true
-    },
+supabase
+.from("invoices")
+.select("*")
+.eq("id",invoiceId)
+.single(),
 
-    {
-      id:"price",
-      label:"السعر",
-      type:"number",
-      required:true
-    },
+supabase
+.from("invoice_products")
+.select("*")
+.eq("invoice_id",invoiceId)
 
-    {
-      id:"type",
-      label:"نوع البيع",
-      type:"select",
-      required:true,
-      options:[
-       {value:"cash",label:"💵 كاش"},
-       {value:"credit",label:"📋 آجل"},
-       {value:"shop",label:"🏬 محل"}
-      ]
-    },
+]);
 
-    {
-      id:"customer_id",
-      label:"العميل",
-      type:"select",
-      options:(customers||[]).map(c=>({
-         value:c.id,
-         label:c.full_name
-      }))
-    },
+app.innerHTML=`
 
-    {
-      id:"shop_id",
-      label:"المحل",
-      type:"select",
-      options:(shops||[]).map(s=>({
-         value:s.id,
-         label:s.name
-      }))
-    }
-   ],
+<button
+class="btn"
+onclick="
+navigate('sales')
+">
+رجوع
+</button>
 
-   submitLabel:"✅ تأكيد البيع",
+<h3>
+${invoice.supplier_name}
+</h3>
 
-   onSubmit: async(vals)=>{
+${renderProducts(
+products,
+invoiceId
+)}
 
-      if(vals.type==="credit" && !vals.customer_id){
-        throw new Error("اختر العميل");
-      }
-
-      if(vals.type==="shop" && !vals.shop_id){
-        throw new Error("اختر المحل");
-      }
-
-      window._saleLock=true;
-
-      try{
-
-        const customerName=
-          vals.customer_id
-          ? (customers||[]).find(
-             x=>x.id===vals.customer_id
-            )?.full_name
-          : null;
-
-        const result=
-          await sellProductAtomic({
-
-            p_product_id:productId,
-            p_invoice_id:invoiceId,
-
-            p_qty:vals.qty,
-            p_price:vals.price,
-            p_total:vals.qty*vals.price,
-
-            p_type:vals.type,
-
-            p_customer_id:
-              vals.customer_id||null,
-
-            p_shop_id:
-              vals.shop_id||null,
-
-            p_customer_name:
-              customerName,
-
-            p_date:
-             new Date()
-             .toISOString()
-             .split("T")[0]
-
-          });
-
-        if(!result.success){
-          throw new Error(result.error);
-        }
-
-        await addAuditLog(
-         "sell_product",
-         {
-           productId,
-           qty:vals.qty,
-           price:vals.price,
-           type:vals.type
-         }
-        );
-
-        await checkInvoiceClose(invoiceId);
-
-        closeModal();
-
-        toast(
-         "تم البيع بنجاح",
-         "success"
-        );
-
-        openSalesInvoice(invoiceId);
-
-      }finally{
-        window._saleLock=false;
-      }
-   }
-
- });
+`;
 
 };
 
 
 
-// ======================================
-// رفع مورد (لا يدخل في المبيعات)
-// ======================================
-window.returnProduct = async function(productId,invoiceId){
+function renderProducts(
+products,
+invoiceId
+){
 
- inputModal({
-   title:"↩️ رفع بضاعة للمورد",
+if(!products?.length){
 
-   fields:[
-    {
-      id:"qty",
-      label:"الكمية المرفوعة",
-      type:"number",
-      required:true
-    }
-   ],
+return `
+<div class='card'>
+لا توجد أصناف
+</div>
+`;
 
-   submitLabel:"تأكيد",
+}
 
-   onSubmit: async(vals)=>{
+return products.map(p=>{
 
-      const r=
-       await returnProductAtomic(
-         productId,
-         vals.qty
-       );
+const rem=
+Number(p.qty||0)
+-
+Number(p.sold||0)
+-
+Number(p.returned||0);
 
-      if(!r.success){
-        throw new Error(r.error);
-      }
+return `
 
-      await addAuditLog(
-       "return_product",
-       {
-         productId,
-         qty:vals.qty
-       }
-      );
+<div class="card">
 
-      await checkInvoiceClose(invoiceId);
+<div style="
+display:flex;
+justify-content:space-between;
+">
 
-      closeModal();
+<div>
+<b>${p.name}</b>
+<div>
+كمية:
+${p.qty}
 
-      toast(
-       "تم رفع البضاعة",
-       "success"
-      );
+|
+مباع:
+${p.sold||0}
+</div>
+</div>
 
-      openSalesInvoice(invoiceId);
-   }
- });
+<div>
+متبقي
+${rem}
+</div>
+
+</div>
+
+
+<div style="
+margin-top:15px;
+display:flex;
+gap:10px;
+">
+
+${
+rem>0
+?
+
+`
+<button
+class='btn'
+onclick="
+sellProduct(
+'${p.id}',
+'${invoiceId}'
+)">
+💰 بيع
+</button>
+`
+
+:
+"نفذ"
+}
+
+</div>
+
+</div>
+
+`;
+
+}).join('');
+
+}
+
+
+
+/* ==========================
+بيع جديد
+========================== */
+
+window.sellProduct=
+async function(
+productId,
+invoiceId
+){
+
+if(window._saleLock){
+return;
+}
+
+const[
+{data:customers},
+{data:shops}
+]=await Promise.all([
+
+supabase
+.from("customers")
+.select("id,full_name"),
+
+supabase
+.from("market_shops")
+.select("id,name")
+
+]);
+
+inputModal({
+
+title:"تسجيل بيع",
+
+fields:[
+
+{
+id:"count",
+label:"العدد",
+type:"number",
+required:true
+},
+
+{
+id:"weight",
+label:"الوزن (اختياري)",
+type:"number"
+},
+
+{
+id:"price",
+label:"السعر",
+type:"number",
+required:true
+},
+
+{
+id:"sale_type",
+label:"نوع البيع",
+type:"select",
+options:[
+
+{
+value:"cash",
+label:"كاش"
+},
+
+{
+value:"credit",
+label:"آجل"
+}
+
+]
+
+},
+
+{
+id:"customer_id",
+label:"اختيار عميل",
+type:"select",
+options:[
+{
+value:"",
+label:"-- اختر --"
+},
+...(customers||[]).map(c=>({
+value:c.id,
+label:c.full_name
+}))
+]
+},
+
+{
+id:"shop_id",
+label:"اختيار محل",
+type:"select",
+options:[
+{
+value:"",
+label:"-- اختر --"
+},
+...(shops||[]).map(s=>({
+value:s.id,
+label:s.name
+}))
+]
+}
+
+],
+
+submitLabel:"تأكيد البيع",
+
+
+onSubmit:
+async(vals)=>{
+
+const count=
+Number(
+vals.count||0
+);
+
+const weight=
+Number(
+vals.weight||0
+);
+
+const price=
+Number(
+vals.price||0
+);
+
+/* المنطق التلقائي */
+const total=
+weight>0
+?
+weight*price
+:
+count*price;
+
+
+/* لو آجل لازم جهة واحدة فقط */
+if(
+vals.sale_type==="credit"
+){
+
+if(
+!vals.customer_id &&
+!vals.shop_id
+){
+throw new Error(
+"اختر عميل أو محل"
+);
+}
+
+if(
+vals.customer_id &&
+vals.shop_id
+){
+throw new Error(
+"اختر جهة واحدة فقط"
+);
+}
+
+}
+
+
+/* لو كاش تجاهل العميل والمحل */
+let customerId=null;
+let shopId=null;
+let customerName=null;
+
+if(
+vals.sale_type==="credit"
+){
+
+customerId=
+vals.customer_id||null;
+
+shopId=
+vals.shop_id||null;
+
+if(customerId){
+
+customerName=
+(customers||[])
+.find(
+x=>x.id===customerId
+)?.full_name;
+
+}
+
+}
+
+
+window._saleLock=true;
+
+try{
+
+const r=
+await sellProductAtomic({
+
+p_product_id:
+productId,
+
+p_invoice_id:
+invoiceId,
+
+p_qty:count,
+
+p_count:count,
+
+p_weight:
+weight||null,
+
+p_price:price,
+
+p_total:total,
+
+p_type:
+vals.sale_type,
+
+p_customer_id:
+customerId,
+
+p_shop_id:
+shopId,
+
+p_customer_name:
+customerName,
+
+p_date:
+new Date()
+.toISOString()
+.split("T")[0]
+
+});
+
+if(!r.success){
+
+throw new Error(
+r.error
+);
+
+}
+
+await addAuditLog(
+"sell_product",
+{
+productId,
+count,
+weight,
+price,
+total
+}
+);
+
+await checkInvoiceClose(
+invoiceId
+);
+
+closeModal();
+
+toast(
+"تم البيع",
+"success"
+);
+
+openSalesInvoice(
+invoiceId
+);
+
+}
+finally{
+
+window._saleLock=false;
+
+}
+
+}
+
+});
 
 };
 
 
-// ======================================
-// إغلاق الفاتورة تلقائي
-// gross من البيع الفعلي فقط
-// returned لا يدخل
-// ======================================
-async function checkInvoiceClose(invoiceId){
 
- const {data:products}=await supabase
-   .from("invoice_products")
-   .select("*")
-   .eq("invoice_id",invoiceId);
+/* ======================
+رفع مورد
+====================== */
 
- const allDone=(products||[])
- .every(p=>
-   ((p.qty||0)
-   -(p.sold||0)
-   -(p.returned||0))<=0
- );
+window.returnProduct=
+async function(
+productId,
+invoiceId
+){
 
- if(!allDone) return;
+inputModal({
 
- const {data:invoice}=await supabase
-   .from("invoices")
-   .select("*")
-   .eq("id",invoiceId)
-   .single();
+title:"رفع بضاعة",
 
- if(!invoice || invoice.status!=="confirmed"){
-   return;
- }
+fields:[
 
- // مهم:
- // sales_total = بيع فعلي فقط
- const gross=(products||[])
- .reduce(
-   (s,p)=>s+Number(
-      p.sales_total||0
-   ),
-   0
- );
+{
+id:"qty",
+label:"الكمية",
+type:"number"
+}
 
- const rate=invoice.commission_rate||0.07;
+],
 
- const commission=
-   gross*rate;
+onSubmit:
+async(vals)=>{
 
- const expenses=
-  Number(invoice.noulon||0)
- +Number(invoice.mashal||0);
+const r=
+await returnProductAtomic(
+productId,
+vals.qty
+);
 
- const net=
-   gross
-   -commission
-   -expenses
-   -Number(invoice.advance_payment||0);
+if(!r.success){
 
- await dbUpdate(
-   "invoices",
-   invoiceId,
-   {
-    status:"closed",
-    gross,
-    commission,
-    total_expenses:expenses,
-    net
-   }
- );
+throw new Error(
+r.error
+);
 
- await addAuditLog(
-   "close_invoice",
-   {
-     invoiceId,
-     gross,
-     commission,
-     net
-   }
- );
+}
 
- toast(
-   "🔒 تم إغلاق الفاتورة",
-   "info"
- );
+await checkInvoiceClose(
+invoiceId
+);
+
+closeModal();
+
+openSalesInvoice(
+invoiceId
+);
+
+}
+
+});
+
+};
+
+
+
+async function checkInvoiceClose(
+invoiceId
+){
+
+const {data:products}=await supabase
+.from("invoice_products")
+.select("*")
+.eq(
+"invoice_id",
+invoiceId
+);
+
+const done=
+(products||[])
+.every(p=>
+
+(
+Number(p.qty)
+-
+Number(p.sold)
+-
+Number(p.returned)
+)<=0
+
+);
+
+if(!done){
+return;
+}
+
+const {data:invoice}=await supabase
+.from("invoices")
+.select("*")
+.eq("id",invoiceId)
+.single();
+
+const gross=
+(products||[])
+.reduce(
+(s,p)=>
+s+
+Number(
+p.sales_total||0
+),
+0
+);
+
+const rate=
+invoice.commission_rate||0.07;
+
+const commission=
+gross*rate;
+
+const net=
+gross
+-commission
+-Number(
+invoice.noulon||0
+)
+-Number(
+invoice.mashal||0
+)
+-Number(
+invoice.advance_payment||0
+);
+
+await dbUpdate(
+"invoices",
+invoiceId,
+{
+status:"closed",
+gross,
+commission,
+net
+}
+);
+
 }
