@@ -330,8 +330,6 @@ await dbInsert('invoice_products',{
  returned:0
 });
 
-alert('وصل بعد insert');
-
 closeModal();
 
 toast('تمت الإضافة','success');
