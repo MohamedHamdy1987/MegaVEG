@@ -104,7 +104,50 @@ ${fieldsHtml}
 <button id='input-submit'>${config.submitLabel||'حفظ'}</button>
 <button onclick='closeModal()'>إلغاء</button>
 `,{preventClose:true});
+/* dynamic hide/show fields */
 
+const saleTypeEl =
+document.querySelector('[name="sale_type"]');
+
+const customerEl =
+document.querySelector('[name="customer_id"]')?.closest('.field');
+
+const shopEl =
+document.querySelector('[name="shop_id"]')?.closest('.field');
+
+function toggleSaleFields(){
+
+ if(!saleTypeEl) return;
+
+ const v=saleTypeEl.value;
+
+ if(v==="cash"){
+
+   if(customerEl)
+     customerEl.style.display="none";
+
+   if(shopEl)
+     shopEl.style.display="none";
+ }
+
+ if(v==="credit"){
+
+   if(customerEl)
+     customerEl.style.display="block";
+
+   if(shopEl)
+     shopEl.style.display="block";
+ }
+
+}
+
+if(saleTypeEl){
+ saleTypeEl.addEventListener(
+   "change",
+   toggleSaleFields
+ );
+ toggleSaleFields();
+}
 const submitBtn=document.getElementById('input-submit');
 const errorDiv=document.getElementById('input-error');
 
