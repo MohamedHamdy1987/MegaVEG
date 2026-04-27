@@ -78,7 +78,11 @@ return `
 <label>${f.label}</label>
 <select id='ifield-${fid}'>
 <option value=''>-- اختر --</option>
-${(f.options||[]).map(o=>`<option value='${o.value}'>${o.label}</option>`).join('')}
+${(f.options||[]).map(o=>`
+<option value='${o.value}'>
+${o.label}
+</option>
+`).join('')}
 </select>
 </div>`;
 }
@@ -99,12 +103,27 @@ ${f.step?`step='${f.step}'`:''}
 
 modal(`
 <h3>${config.title}</h3>
+
 ${fieldsHtml}
-<div id='input-error' style='display:none'></div>
-<button id='input-submit'>${config.submitLabel||'حفظ'}</button>
-<button onclick='closeModal()'>إلغاء</button>
+
+<div id='input-error'
+style='display:none'>
+</div>
+
+<button id='input-submit'>
+${config.submitLabel||'حفظ'}
+</button>
+
+<button onclick='closeModal()'>
+إلغاء
+</button>
+
 `,{preventClose:true});
-/* dynamic hide/show الصحيح */
+
+
+/* =====================================
+Dynamic Cash / Credit show-hide
+===================================== */
 
 const saleTypeEl=
 document.getElementById(
@@ -123,110 +142,188 @@ document.getElementById(
 
 function toggleSaleFields(){
 
- if(!saleTypeEl) return;
+if(!saleTypeEl) return;
 
- const v=saleTypeEl.value;
+const v=saleTypeEl.value;
 
- if(v==="cash"){
+if(v==="cash"){
 
-   if(customerWrap)
-    customerWrap.style.display='none';
+if(customerWrap)
+customerWrap.style.display='none';
 
-   if(shopWrap)
-    shopWrap.style.display='none';
- }
+if(shopWrap)
+shopWrap.style.display='none';
 
- if(v==="credit"){
+}
 
-   if(customerWrap)
-    customerWrap.style.display='block';
+if(v==="credit"){
 
-   if(shopWrap)
-    shopWrap.style.display='block';
- }
+if(customerWrap)
+customerWrap.style.display='block';
+
+if(shopWrap)
+shopWrap.style.display='block';
+
+}
 
 }
 
 if(saleTypeEl){
 
- saleTypeEl.addEventListener(
-  'change',
-  toggleSaleFields
- );
+saleTypeEl.addEventListener(
+'change',
+toggleSaleFields
+);
 
- toggleSaleFields();
+toggleSaleFields();
 
 }
-const submitBtn=document.getElementById('input-submit');
-const errorDiv=document.getElementById('input-error');
+
+
+/* =====================================
+Submit
+===================================== */
+
+const submitBtn=
+document.getElementById(
+'input-submit'
+);
+
+const errorDiv=
+document.getElementById(
+'input-error'
+);
 
 function showError(msg){
+
 errorDiv.style.display='block';
+
 errorDiv.textContent=msg;
+
 }
+
 let busy=false;
+
 submitBtn.onclick=async()=>{
 
-/* منع double submit */
 if(busy) return;
+
 busy=true;
 
 const values={};
+
 let valid=true;
+
 errorDiv.style.display='none';
 
+
 for(const f of config.fields){
+
 const fid=safeId(f.id);
-const el=document.getElementById(`ifield-${fid}`);
+
+const el=
+document.getElementById(
+`ifield-${fid}`
+);
+
 if(!el) continue;
-const raw=el.value.trim();
 
-if(f.required&&!raw){
-showError(`${f.label} مطلوب`);
+const raw=
+el.value.trim();
+
+if(
+f.required &&
+!raw
+){
+showError(
+`${f.label} مطلوب`
+);
 valid=false;
 break;
 }
 
-if(f.type==='number'&&raw){
-const num=parseFloat(raw);
-if(isNaN(num)){
-showError('رقم غير صحيح');
+if(
+f.type==='number'
+&& raw
+){
+
+const num=
+parseFloat(raw);
+
+if(
+isNaN(num)
+){
+showError(
+'رقم غير صحيح'
+);
 valid=false;
 break;
 }
+
 values[f.id]=num;
+
 }else{
+
 values[f.id]=raw;
+
 }
+
 }
+
 
 if(!valid){
+
 busy=false;
+
 return;
+
 }
+
 
 submitBtn.disabled=true;
 
 try{
-await config.onSubmit(values);
+
+await config.onSubmit(
+values
+);
+
 }
 catch(err){
-showError(err?.message||'خطأ');
+
+showError(
+err?.message||'خطأ'
+);
+
 submitBtn.disabled=false;
+
 }
 finally{
+
 busy=false;
+
 }
 
 };
 
+
+/* focus first field */
 setTimeout(()=>{
-const first=document.getElementById(`ifield-${safeId(config.fields[0]?.id)}`);
-if(first) first.focus();
+
+const first=
+document.getElementById(
+`ifield-${safeId(config.fields[0]?.id)}`
+);
+
+if(first)
+first.focus();
+
 },120);
 
 }
 
+   if(valid=false;
+bre
 export function loading(el,rows=4){
 if(!el)return;
 el.innerHTML=Array(rows).fill(0).map(()=>`<div class='skeleton skeleton-card'></div>`).join('');
