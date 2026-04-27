@@ -1,711 +1,291 @@
-/* =========================
-Toast
-========================= */
-
-export function toast(
-msg,
-type='success',
-duration=3000
-){
-
-const container=
-document.getElementById(
-'toast'
-);
-
+/* Toast */
+export function toast(msg,type='success',duration=3000){
+const container=document.getElementById('toast');
 if(!container)return;
-
-const icons={
-success:'✅',
-error:'❌',
-warning:'⚠️',
-info:'ℹ️'
-};
-
-const el=
-document.createElement('div');
-
-el.className=
-`toast ${type}`;
-
-el.innerHTML=
-`<span>${icons[type]||'📢'}</span>
-<span>${msg}</span>`;
-
+const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+const el=document.createElement('div');
+el.className=`toast ${type}`;
+el.innerHTML=`<span>${icons[type]||'📢'}</span><span>${msg}</span>`;
 container.appendChild(el);
-
-const timer=
-setTimeout(
-remove,
-duration
-);
-
+const timer=setTimeout(remove,duration);
 function remove(){
-
 el.style.opacity='0';
-
-setTimeout(()=>{
-if(el.parentNode)
-el.remove();
-},300);
-
+setTimeout(()=>{if(el.parentNode)el.remove();},300);
+}
+el.onclick=()=>{clearTimeout(timer);remove();};
 }
 
-el.onclick=()=>{
-clearTimeout(timer);
-remove();
-};
-
-}
-
-
-
-/* =========================
-Modal
-========================= */
-
-export function modal(
-content,
-options={}
-){
-
-const m=
-document.getElementById(
-'modal'
-);
-
-const body=
-document.getElementById(
-'modal-body'
-);
-
+/* Modal */
+export function modal(content,options={}){
+const m=document.getElementById('modal');
+const body=document.getElementById('modal-body');
 if(!m||!body)return;
-
 body.innerHTML=content;
-
-m.classList.remove(
-'hidden'
-);
-
+m.classList.remove('hidden');
 m.onclick=(e)=>{
-
-if(
-e.target===m
-&&
-!options.preventClose
-){
+if(e.target===m&&!options.preventClose){
 closeModal();
 }
-
 };
-
 }
-
-
 
 export function closeModal(){
-
-const m=
-document.getElementById(
-'modal'
-);
-
-const body=
-document.getElementById(
-'modal-body'
-);
-
+const m=document.getElementById('modal');
+const body=document.getElementById('modal-body');
 if(!m)return;
-
 m.style.opacity='0';
-
 setTimeout(()=>{
-
-m.classList.add(
-'hidden'
-);
-
+m.classList.add('hidden');
 m.style.opacity='';
-
-if(body)
-body.innerHTML='';
-
+if(body) body.innerHTML='';
 },200);
-
 }
+window.closeModal=closeModal;
 
-window.closeModal=
-closeModal;
-
-
-
-/* =========================
-Confirm
-========================= */
-
-export function confirmModal(
-msg,
-onConfirm
-){
-
+/* Confirm */
+export function confirmModal(msg,onConfirm){
 modal(`
-
 <h3>تأكيد</h3>
-
 <p>${msg}</p>
-
-<button id='confirm-yes'>
-تأكيد
-</button>
-
-<button
-onclick='closeModal()'>
-إلغاء
-</button>
-
+<button id='confirm-yes'>تأكيد</button>
+<button onclick='closeModal()'>إلغاء</button>
 `);
 
-document.getElementById(
-'confirm-yes'
-).onclick=async()=>{
-
+document.getElementById('confirm-yes').onclick=async()=>{
 closeModal();
-
 try{
-
 if(onConfirm){
-
 await onConfirm();
-
 }
-
+}catch(e){
+toast(e?.message||'خطأ','error');
 }
-catch(e){
-
-toast(
-e?.message||'خطأ',
-'error'
-);
-
-}
-
 };
-
 }
 
+/* Input Modal - Updated with dynamic show/hide & mutual exclusive for sale_type */
+export function inputModal(config){
 
+const safeId=v=>String(v).replace(/[^a-z0-9_-]/gi,'');
 
-/* =========================
-Input Modal
-========================= */
+const wrapField=(html)=>`<div class="field-wrap">${html}</div>`;
 
-export function inputModal(
-config
-){
+const fieldsHtml=config.fields.map(f=>{
+const fid=safeId(f.id);
 
-const safeId=v=>
-String(v).replace(
-/[^a-z0-9_-]/gi,
-''
-);
-
-
-
-const fieldsHtml=
-config.fields.map(f=>{
-
-const fid=
-safeId(f.id);
-
-
-if(
-f.type==='select'
-){
-
-return `
-
-<div>
-
-<label>
-${f.label}
-</label>
-
-<select
-id='ifield-${fid}'>
-
-<option value=''>
--- اختر --
-</option>
-
-${(f.options||[])
-.map(o=>`
-
+if(f.type==='select'){
+return wrapField(`
+<label>${f.label}</label>
+<select id='ifield-${fid}'>
+<option value=''>-- اختر --</option>
+${(f.options||[]).map(o=>`
 <option value='${o.value}'>
 ${o.label}
 </option>
-
 `).join('')}
-
 </select>
-
-</div>
-
-`;
-
+`);
 }
 
-
-return `
-
-<div>
-
-<label>
-${f.label}
-</label>
-
+return wrapField(`
+<label>${f.label}</label>
 <input
 id='ifield-${fid}'
-
 type='${f.type||'text'}'
-
-${f.value!==undefined
-?`value='${f.value}'`
-:''}
-
-${f.min!==undefined
-?`min='${f.min}'`
-:''}
-
-${f.step
-?`step='${f.step}'`
-:''}
-
+${f.value!==undefined?`value='${f.value}'`:''}
+${f.min!==undefined?`min='${f.min}'`:''}
+${f.step?`step='${f.step}'`:''}
 >
-
-</div>
-
-`;
+`);
 
 }).join('');
 
-
-
 modal(`
-
-<h3>
-${config.title}
-</h3>
-
+<h3>${config.title}</h3>
 ${fieldsHtml}
+<div id='input-error' style='display:none'></div>
+<button id='input-submit'>${config.submitLabel||'حفظ'}</button>
+<button onclick='closeModal()'>إلغاء</button>
+`,{preventClose:true});
 
-<div
-id='input-error'
-style='display:none'>
-</div>
+/* ==========================
+Dynamic show/hide
+========================== */
+const saleTypeEl = document.getElementById('ifield-sale_type');
+const customerEl = document.getElementById('ifield-customer_id');
+const shopEl = document.getElementById('ifield-shop_id');
+const customerWrap = customerEl?.closest('.field-wrap');
+const shopWrap = shopEl?.closest('.field-wrap');
 
-<button id='input-submit'>
-${config.submitLabel||'حفظ'}
-</button>
+function updateSaleUI(){
+if(!saleTypeEl) return;
+const t = saleTypeEl.value;
 
-<button
-onclick='closeModal()'>
-إلغاء
-</button>
-
-`,{
-preventClose:true
-});
-
-
-
-/* =========================
-Dynamic Cash/Credit
-========================= */
-
-const saleTypeEl=
-document.getElementById(
-'ifield-sale_type'
-);
-
-const customerWrap=
-document.getElementById(
-'ifield-customer_id'
-)?.parentElement;
-
-const shopWrap=
-document.getElementById(
-'ifield-shop_id'
-)?.parentElement;
-
-
-function toggleSaleFields(){
-
-if(!saleTypeEl)
-return;
-
-const v=
-saleTypeEl.value;
-
-
-if(v==="cash"){
-
-if(customerWrap)
-customerWrap.style.display='none';
-
-if(shopWrap)
-shopWrap.style.display='none';
-
+/* كاش */
+if(t === "cash"){
+if(customerWrap) customerWrap.style.display = 'none';
+if(shopWrap) shopWrap.style.display = 'none';
+if(customerEl){
+customerEl.value = '';
+customerEl.disabled = false;
+}
+if(shopEl){
+shopEl.value = '';
+shopEl.disabled = false;
+}
 }
 
-
-if(v==="credit"){
-
-if(customerWrap)
-customerWrap.style.display='block';
-
-if(shopWrap)
-shopWrap.style.display='block';
-
+/* آجل */
+if(t === "credit"){
+if(customerWrap) customerWrap.style.display = 'block';
+if(shopWrap) shopWrap.style.display = 'block';
+updateExclusive();
+}
 }
 
+function updateExclusive(){
+if(!customerEl || !shopEl) return;
+
+/* لو اختار عميل */
+if(customerEl.value){
+shopEl.value = '';
+shopEl.disabled = true;
+} else {
+shopEl.disabled = false;
 }
 
+/* لو اختار محل */
+if(shopEl.value){
+customerEl.value = '';
+customerEl.disabled = true;
+} else {
+customerEl.disabled = false;
+}
+}
 
 if(saleTypeEl){
-
-saleTypeEl.addEventListener(
-'change',
-toggleSaleFields
-);
-
-toggleSaleFields();
-
+saleTypeEl.addEventListener('change', updateSaleUI);
+}
+if(customerEl){
+customerEl.addEventListener('change', updateExclusive);
+}
+if(shopEl){
+shopEl.addEventListener('change', updateExclusive);
 }
 
+/* أول تحميل */
+updateSaleUI();
 
-
-/* =========================
+/* ==========================
 Submit
-========================= */
-
-const submitBtn=
-document.getElementById(
-'input-submit'
-);
-
-const errorDiv=
-document.getElementById(
-'input-error'
-);
-
+========================== */
+const submitBtn = document.getElementById('input-submit');
+const errorDiv = document.getElementById('input-error');
 
 function showError(msg){
-
-errorDiv.style.display=
-'block';
-
-errorDiv.textContent=msg;
-
+errorDiv.style.display = 'block';
+errorDiv.textContent = msg;
 }
 
+let busy = false;
 
-let busy=false;
+submitBtn.onclick = async () => {
+if(busy) return;
+busy = true;
 
+const values = {};
+let valid = true;
+errorDiv.style.display = 'none';
 
-submitBtn.onclick=
-async()=>{
+for(const f of config.fields){
+const fid = safeId(f.id);
+const el = document.getElementById(`ifield-${fid}`);
+if(!el) continue;
+const raw = el.value.trim();
 
-if(busy)
-return;
-
-busy=true;
-
-const values={};
-
-let valid=true;
-
-errorDiv.style.display=
-'none';
-
-
-
-for(
-const f
-of config.fields
-){
-
-const fid=
-safeId(f.id);
-
-const el=
-document.getElementById(
-`ifield-${fid}`
-);
-
-if(!el)
-continue;
-
-
-const raw=
-el.value.trim();
-
-
-if(
-f.required
-&&
-!raw
-){
-
-showError(
-`${f.label} مطلوب`
-);
-
-valid=false;
-
+if(f.required && !raw){
+showError(`${f.label} مطلوب`);
+valid = false;
 break;
-
 }
 
-
-
-if(
-f.type==='number'
-&& raw
-){
-
-const num=
-parseFloat(raw);
-
-if(
-isNaN(num)
-){
-
-showError(
-'رقم غير صحيح'
-);
-
-valid=false;
-
+if(f.type === 'number' && raw){
+const num = parseFloat(raw);
+if(isNaN(num)){
+showError('رقم غير صحيح');
+valid = false;
 break;
-
 }
-
-values[f.id]=num;
-
+values[f.id] = num;
+} else {
+values[f.id] = raw;
 }
-else{
-
-values[f.id]=raw;
-
 }
-
-}
-
-
 
 if(!valid){
-
-busy=false;
-
+busy = false;
 return;
-
 }
 
-
-
-submitBtn.disabled=true;
-
+submitBtn.disabled = true;
 
 try{
-
-await config.onSubmit(
-values
-);
-
+await config.onSubmit(values);
+} catch(err){
+showError(err?.message || 'خطأ');
+submitBtn.disabled = false;
+} finally{
+busy = false;
 }
-catch(err){
-
-showError(
-err?.message||'خطأ'
-);
-
-submitBtn.disabled=false;
-
-}
-finally{
-
-busy=false;
-
-}
-
 };
 
-
-
 setTimeout(()=>{
-
-const first=
-document.getElementById(
-
-`ifield-${
-safeId(
-config.fields[0]?.id
-)
-}`
-
-);
-
-if(first)
-first.focus();
-
+const first = document.getElementById(`ifield-${safeId(config.fields[0]?.id)}`);
+if(first) first.focus();
 },120);
-
 }
 
-
-
-/* ========================= */
-
-export function loading(
-el,
-rows=4
-){
+export function loading(el,rows=4){
 if(!el)return;
-
-el.innerHTML=
-Array(rows)
-.fill(0)
-.map(()=>
-`<div class='skeleton skeleton-card'></div>`
-).join('');
-
+el.innerHTML=Array(rows).fill(0).map(()=>`<div class='skeleton skeleton-card'></div>`).join('');
 }
 
-
-
-export function emptyState(
-icon,
-title,
-sub,
-actionHtml=''
-){
-
+export function emptyState(icon,title,sub,actionHtml=''){
 return `
-
 <div class='empty-state'>
-
 <div>${icon}</div>
-
 <div>${title}</div>
-
 <div>${sub}</div>
-
 ${actionHtml}
-
-</div>
-
-`;
-
+</div>`;
 }
-
-
 
 export function formatCurrency(num){
-
-const n=
-Number(num||0);
-
-return n.toLocaleString(
-'ar-EG',
-{
-minimumFractionDigits:0,
-maximumFractionDigits:2
+const n=Number(num||0);
+return n.toLocaleString('ar-EG',{minimumFractionDigits:0,maximumFractionDigits:2})+' ج';
 }
-)+' ج';
-
-}
-
-
 
 export function formatDate(dateStr){
-
-if(!dateStr)
-return '–';
-
+if(!dateStr)return '–';
 try{
-
-return new Date(
-dateStr
-).toLocaleDateString(
-'ar-EG'
-);
-
-}
-catch{
-
+return new Date(dateStr).toLocaleDateString('ar-EG');
+}catch{
 return dateStr;
-
+}
 }
 
-}
-
-
-
-export function mobileCardTable(
-items,
-columns,
-getActions
-){
-
+export function mobileCardTable(items,columns,getActions){
 if(!items?.length){
-
-return emptyState(
-'📋',
-'لا يوجد بيانات',
-''
-);
-
+return emptyState('📋','لا يوجد بيانات','');
 }
-
-const fmt=
-(col,item)=>
-
-col.format
-?col.format(
-item[col.key],
-item
-)
-
-:(item[col.key]??'–');
-
-
+const fmt=(col,item)=>col.format?col.format(item[col.key],item):(item[col.key]??'–');
 return items.map(item=>`
-
 <div class='card'>
-
-${columns.map(c=>
-
-`<div>
-${c.label}:
-${fmt(c,item)}
-</div>`
-
-).join('')}
-
-${getActions?
-getActions(item)
-:''}
-
-</div>
-
-`).join('');
-
+${columns.map(c=>`<div>${c.label}: ${fmt(c,item)}</div>`).join('')}
+${getActions?getActions(item):''}
+</div>`).join('');
 }
-
-
 
 export function confirmDialog(msg){
-
 return window.confirm(msg);
-
-   }
+}
