@@ -112,14 +112,12 @@ function showError(msg){
 errorDiv.style.display='block';
 errorDiv.textContent=msg;
 }
-
+let busy=false;
 submitBtn.onclick=async()=>{
 
 /* منع double submit */
-if(window._modalBusy){
-return;
-}
-window._modalBusy=true;
+if(busy) return;
+busy=true;
 
 const values={};
 let valid=true;
@@ -151,7 +149,7 @@ values[f.id]=raw;
 }
 
 if(!valid){
-window._modalBusy=false;
+busy=false;
 return;
 }
 
@@ -165,7 +163,7 @@ showError(err?.message||'خطأ');
 submitBtn.disabled=false;
 }
 finally{
-window._modalBusy=false;
+busy=false;
 }
 
 };
