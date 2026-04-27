@@ -321,29 +321,30 @@ min:1
 ],
 submitLabel:'حفظ',
 onSubmit:async(vals)=>{
-onSubmit: async(vals)=>{
 
 const { error } = await supabase
 .from('invoice_products')
 .insert({
-  invoice_id: invoiceId,
-  name: vals.name,
-  qty: vals.qty,
-  sold: 0,
-  returned: 0
+  invoice_id:invoiceId,
+  name:vals.name,
+  qty:Number(vals.qty),
+  sold:0,
+  returned:0
 });
-closeModal();
+
 if(error){
   alert(error.message);
   throw error;
 }
 
-toast('تمت الإضافة','success');
-location.reload();
+alert('وصل بعد insert');
 
-}
+closeModal();
+
 toast('تمت الإضافة','success');
+
 openInvoice(invoiceId);
+
 }
 });
 };
@@ -486,7 +487,6 @@ toast(
 );
 
 openInvoice(invoiceId);
-
 }
 
 });
