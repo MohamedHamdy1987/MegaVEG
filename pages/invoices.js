@@ -322,14 +322,12 @@ min:1
 submitLabel:'حفظ',
 onSubmit:async(vals)=>{
 
-const { error } = await supabase
-.from('invoice_products')
-.insert({
-  invoice_id:invoiceId,
-  name:vals.name,
-  qty:Number(vals.qty),
-  sold:0,
-  returned:0
+await dbInsert('invoice_products',{
+ invoice_id:invoiceId,
+ name:vals.name,
+ qty:Number(vals.qty),
+ sold:0,
+ returned:0
 });
 
 if(error){
