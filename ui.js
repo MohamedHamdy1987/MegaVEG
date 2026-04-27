@@ -149,11 +149,14 @@ function toggleSaleFields(){
 }
 
 if(saleTypeEl){
+
  saleTypeEl.addEventListener(
   'change',
   toggleSaleFields
  );
+
  toggleSaleFields();
+
 }
 const submitBtn=document.getElementById('input-submit');
 const errorDiv=document.getElementById('input-error');
