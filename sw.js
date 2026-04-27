@@ -1,4 +1,4 @@
-const CACHE_VER='v4.2';
+const CACHE_VER='v5.0';
 const CACHE_STATIC=`market-pro-static-${CACHE_VER}`;
 const CACHE_PAGES=`market-pro-pages-${CACHE_VER}`;
 const ALL_CACHES=[CACHE_STATIC,CACHE_PAGES];
