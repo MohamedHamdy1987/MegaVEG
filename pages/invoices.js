@@ -332,7 +332,7 @@ const { error } = await supabase
   sold: 0,
   returned: 0
 });
-
+closeModal();
 if(error){
   alert(error.message);
   throw error;
