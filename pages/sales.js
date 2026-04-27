@@ -385,17 +385,23 @@ count*price;
 
 
 /* لو آجل لازم جهة واحدة فقط */
-if(
-vals.sale_type==="credit"
-){
+if(vals.sale_type==="cash"){
 
-if(
-!vals.customer_id &&
-!vals.shop_id
-){
-throw new Error(
-"اختر عميل أو محل"
-);
+vals.customer_id=null;
+vals.shop_id=null;
+
+}
+
+if(vals.sale_type==="credit"){
+
+if(!vals.customer_id && !vals.shop_id){
+throw new Error("اختر عميل أو محل");
+}
+
+if(vals.customer_id && vals.shop_id){
+throw new Error("اختر جهة واحدة فقط");
+}
+
 }
 
 if(
