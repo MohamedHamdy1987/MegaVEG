@@ -104,7 +104,6 @@ ${fieldsHtml}
 <button id='input-submit'>${config.submitLabel||'حفظ'}</button>
 <button onclick='closeModal()'>إلغاء</button>
 `,{preventClose:true});
-/* dynamic hide/show fields */
 /* dynamic hide/show الصحيح */
 
 const saleTypeEl=
