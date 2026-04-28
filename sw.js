@@ -1,4 +1,4 @@
-const CACHE_VER='marketpro-v6';
+const CACHE_VER='v8';
 
 const CACHE_STATIC=
 `market-pro-static-${CACHE_VER}`;
